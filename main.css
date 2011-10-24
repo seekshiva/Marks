@@ -1,0 +1,9 @@
+body {font-size:1em;}
+
+a {text-decoration:none; }
+a:hover {text-decoration:underline; }
+a:visited {color:#00E; }
+.s {font-size:70%; }
+th {font-size:80%; }
+
+.block {margin:5px; padding:10px; background-color:#dde; }
