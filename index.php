@@ -14,8 +14,15 @@ teams = [<?php echo getTeamsList(); ?>];
 <body>
 <a href="javascript:history.back(1)">Back</a> <a href="./">Home</a><br />
 <div id="wrapper">
-<?php 
-if(isset($_GET['addclass'])) {
+<?php
+if(isset($_GET['subject'])) {
+    if($_GET['subject'] == "add") addSubject();
+    if($_GET['subject'] == "del") {
+        $res = mysql_query("DELETE FROM `subjects` WHERE `class_id` = " . $_GET['classId'] . " AND `course_id` = '" . $_GET['courseId'] . "' LIMIT 1");
+	header("Location: ./?class=" . $_GET['classId']);
+    }
+} 
+else if(isset($_GET['addclass'])) {
     addClass();
 }
 else if(isset($_GET['addstudents'])) {

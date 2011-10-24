@@ -3,6 +3,10 @@ body {font-size:1em;}
 a {text-decoration:none; }
 a:hover {text-decoration:underline; }
 a:visited {color:#00E; }
+.closeButton {font-weight:bold; padding:2px; background-color:#77e; color:#dde; }
+.closeButton:visited {background-color:#77e; color:#dde; }
+.closeButton:hover {color:#00e; background-color:#aab; text-decoration:none; }
+
 .s {font-size:70%; }
 th {font-size:80%; }
 

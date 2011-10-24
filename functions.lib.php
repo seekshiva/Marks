@@ -86,6 +86,8 @@ function addStudents() {
     }
 }
 
+
+
 function editStudentInfo() {
     $uid = explode(",",$_GET['uids']);
     for($i=0;$i<count($uid);$i=$i+1) {
@@ -121,6 +123,14 @@ function addClass() {
 
 }
 
+function addSubject() {
+    if(mysql_num_rows(mysql_query("SELECT * FROM `subjects` WHERE `class_id` = " . $_POST['classId'] . " AND `course_id` = " . $_POST['courseId'] . ";")) == 0) {
+        $query = "INSERT INTO `subjects` (`class_id`, `course_id`) VALUES ('" . $_POST['classId'] . "', '" . $_POST['courseId'] . "');";
+    	mysql_query($query);
+    }
+    header("Location: ./?class=" . $_POST['classId']);
+}
+
 
 function getTeamName($teamId) {
     $row = mysql_fetch_array(mysql_query("SELECT `team_name` FROM `teams` WHERE `team_id` = '" . $teamId . "'"));
@@ -144,27 +154,31 @@ function getClassCurriculum($classId) {
 
 function getStudentsFromClass() {
     $classId = $_GET['class'];
-    echo "<h3>Students in class " . getClassName($classId) . " <span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to " . getClassName($classId) . "</a></span></h3>";
+    echo "<h3>Students in class " . getClassName($classId) . " <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
 
     //the part where the list of courses taught in the class is listed
     echo "<div class=\"block\">";
-    $res = mysql_query("SELECT * FROM `subjects` WHERE `class_id` = '" . $classId . "'");
+    $res = mysql_query("SELECT `coursecode`.`course_code` AS `code`,`coursecode`.`course_name` AS `name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id`='" . $classId . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
+
     if(mysql_num_rows($res) == 0) {
        echo "No subjects found!";
     }
+    else {
+    echo "<table style='margin:5px; ' border='1' cellspacing='0' cellpadding='3'><tr>";
     while($row = mysql_fetch_array($res)) {
-        
+        echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
     }
-    echo "<br />";
+    echo "</tr></table>";
+    }
     $curriculum = getClassCurriculum($classId);
     $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
-    echo "<form action=\"./?subject=add\" method="POST"><span class=\"s\">Add new course for the class:</span> <select>";
+    echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
     echo "<option value=\"0\">-</option>";
     while($row = mysql_fetch_assoc($res)) {
         echo "<option value=\"" . $row['course_code'] . "\">" . $row['course_name'] . "</option>";
     }
-    echo "</select><input type=\"hidden\" name=\"classId\" value=\"\"> <input type=\"submit\" value=\"Go!\">";
-    echo "</form></div>";
+    echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
+    echo "</form></div>\n\n";
 
 
     $res = mysql_query("SELECT `student_id`, `adm_no`, `student_name`, `team_id`, `house_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `student_id`");
