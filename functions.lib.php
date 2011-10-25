@@ -258,6 +258,29 @@ function editStudentMarks() {
     $subjectId = $_GET['editmarks'];
     $marksArr  = Array();
     
+    if(isset($_POST['dummy'])) {
+    
+	$str = "";
+	//die("#### - SELECT `students`.`student_id` FROM `students`,`marks` WHERE `students`.`class_id` = '{$classId}' AND `students`.`student_id` = `marks`.`student_id` AND `marks`.`exam_id` = '{$examId}' AND `marks`.`subject_id` = '{$subjectId}'");
+	$res = mysql_query("SELECT `students`.`student_id` FROM `students`,`marks` WHERE `students`.`class_id` = '{$classId}' AND `students`.`student_id` = `marks`.`student_id` AND `marks`.`exam_id` = '{$examId}' AND `marks`.`subject_id` = '{$subjectId}'");
+    	while($row = mysql_fetch_assoc($res)) {
+	    $str .= ",{" . $row['student_id'] . "}";
+	}
+	foreach($_POST as $key=>$val)
+	if(is_int($key)) {
+	    if($str=="" || !strpos(".".$str,"{" . $key . "}")) {
+	        mysql_query("INSERT INTO `marks` (`student_id`, `exam_id`, `subject_id`, `marks`) VALUES ('{$key}', '{$examId}', '{$subjectId}', '{$val}')");
+	    }
+	    else {
+	        $query = "UPDATE  `marks` SET  `marks` =  '{$val}' WHERE  `student_id` = '{$key}' AND `exam_id` = '{$examId}' AND `subject_id` = '{$subjectId}';";
+	        mysql_query($query);
+	    }
+	}
+    
+	header("Location: ./?class=" . $classId . "&exam=" . $examId);
+        return;
+    }
+
     $query = "SELECT `student_id`,`marks` FROM `marks` WHERE `exam_id` = '{$examId}' AND `subject_id` = '{$subjectId}' AND `student_id` IN (SELECT `student_id` FROM `students` WHERE `class_id` = '{$classId}')";
     $res = mysql_query($query);
     while($row = mysql_fetch_assoc($res)) {
@@ -266,11 +289,12 @@ function editStudentMarks() {
     
     $res = mysql_query("SELECT `adm_no`,`student_id`,`student_name` FROM `students` WHERE `class_id` = '" . $classId . "'");
     echo "<style>input[type='text'] {background-color:#dde; border:#fff; padding:3px;  }</style>";
-    echo "<table border='1' cellspacing='0'>";
+    echo "<form action=\"\" method=\"POST\">";
+    echo "<table border='1' cellspacing='0'>\n";
     while($row = mysql_fetch_assoc($res)) {
-        echo "<tr><td>" .$row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td><input type=\"text\" name=\"\" value=\"" . (($marksArr[$row['student_id']])? $marksArr[$row['student_id']] : "0")  . "\" ></td></tr>";
+        echo "<tr><td>" .$row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td><input type=\"text\" name=\"" . $row['student_id'] . "\" value=\"" . (isset($marksArr[$row['student_id']])? $marksArr[$row['student_id']] : "0")  . "\" ></td></tr>\n";
     }
-    echo "</table>";
+    echo "</table><input type=\"hidden\" name=\"dummy\" value=\"1\"><input type=\"submit\" value=\"Add Marks\" /></form>";
 }
 
 function getStudentsFromTeam($teamId) {
