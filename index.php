@@ -38,8 +38,14 @@ else if(isset($_GET['editstudents'])) {
     	getStudentsFromClass();
     }
 }
+else if(isset($_GET['examName'])) {
+    addExam();
+}
+else if(isset($_GET['class']) && isset($_GET['exam'])) {
+    getStudentsFromClass($_GET['exam']);
+}
 else if(isset($_GET['class'])) {
-    getStudentsFromClass();
+    getStudentsFromClass("");
 }
 else if(isset($_GET['team'])) {
     getStudentsFromTeam($_GET['team']);
