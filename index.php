@@ -42,7 +42,8 @@ else if(isset($_GET['examName'])) {
     addExam();
 }
 else if(isset($_GET['class']) && isset($_GET['exam'])) {
-    getStudentsFromClass($_GET['exam']);
+    if(isset($_GET['editmarks'])) editStudentMarks();
+    else getStudentsFromClass($_GET['exam']);
 }
 else if(isset($_GET['class'])) {
     getStudentsFromClass("");

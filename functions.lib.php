@@ -200,7 +200,6 @@ function getStudentsFromClass($examId) {
         echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
     }
     else {
-    echo "exam id" . $examId . "<br>\n";
     echo "<select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
     echo "<option value=\"0\">--Select an Exam from below--</option>";
     while($row = mysql_fetch_assoc($res)) {
@@ -225,13 +224,51 @@ function getStudentsFromClass($examId) {
     echo "With the below selected students, set <span id=\"listContainer\"></span>";
     echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";
     echo "<tr><th></th><th>Admission Number</th><th>Name</th><th>House</th><th>Team</th>";
-    if($examId != "") foreach($subjectArray as $key=>$val) echo "<th>" . $val . "</th>";
+    if($examId != "") foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
     echo "</tr>\n";
 
     while($row = mysql_fetch_assoc($res)) {
-        $query2 = "SELECT `marks` FROM `marks` WHERE `student_id` = '" . $row['student_id'] . "' AND `exam_id` = '" . $examId . "' ";
-        $res2 = mysql_query($query2);
-        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><input type=\"checkbox\" name=\"studentid[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td></tr>\n";
+        $subjArr = Array();
+        $query2 = "SELECT `subject_id`,`marks` FROM `marks` WHERE `student_id` = '" . $row['student_id'] . "' AND `exam_id` = '" . $examId . "' ";
+	$res2 = mysql_query($query2);
+        while($row2 = mysql_fetch_assoc($res2))
+	{
+	    $subjArr[$row2['subject_id']] = $row2['marks'];
+	}
+        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><input type=\"checkbox\" name=\"studentid[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
+	if($examId!="")
+	foreach($subjectArray as $key=>$val ) {
+	    echo "<td>";
+	    if(isset($subjArr[$key])) {
+	        echo $subjArr[$key] . "<br />";
+	    }
+	    else {
+	        echo "not available<br />";
+	    }
+	    echo "</td>";
+	}
+	echo "</tr>";
+    }
+    echo "</table>";
+}
+
+function editStudentMarks() {
+    $classId   = $_GET['class'];
+    $examId    = $_GET['exam'];
+    $subjectId = $_GET['editmarks'];
+    $marksArr  = Array();
+    
+    $query = "SELECT `student_id`,`marks` FROM `marks` WHERE `exam_id` = '{$examId}' AND `subject_id` = '{$subjectId}' AND `student_id` IN (SELECT `student_id` FROM `students` WHERE `class_id` = '{$classId}')";
+    $res = mysql_query($query);
+    while($row = mysql_fetch_assoc($res)) {
+        $marksArr[$row['student_id']] = $row['marks'];
+    }
+    
+    $res = mysql_query("SELECT `adm_no`,`student_id`,`student_name` FROM `students` WHERE `class_id` = '" . $classId . "'");
+    echo "<style>input[type='text'] {background-color:#dde; border:#fff; padding:3px;  }</style>";
+    echo "<table border='1' cellspacing='0'>";
+    while($row = mysql_fetch_assoc($res)) {
+        echo "<tr><td>" .$row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td><input type=\"text\" name=\"\" value=\"" . (($marksArr[$row['student_id']])? $marksArr[$row['student_id']] : "0")  . "\" ></td></tr>";
     }
     echo "</table>";
 }
