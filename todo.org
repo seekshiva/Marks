@@ -1,0 +1,5 @@
+* Update all possible list of subjects for CBSE and samacheer in the database
+* Enter list of teachers
+* Create all classes in the home page
+* For each class, select the list of courses being taught
+* Enter the list of students for each class

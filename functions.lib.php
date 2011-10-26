@@ -96,7 +96,7 @@ function editStudentInfo() {
 
 function addClass() {
     if(isset($_POST['class'])) {
-        $query = "INSERT INTO `classes` (`class_id`, `class_name`, `curriculum`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['curriculum'] . "');";
+        $query = "INSERT INTO `classes` (`class_id`, `class_name`, `curriculum`, `cteacher_id`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['curriculum'] . "', '" . $_POST['cteacher'] . "');";
         mysql_query($query);
 	header("Location: ./");
     }
@@ -112,7 +112,13 @@ function addClass() {
 		     <option value="Samacheer">Samacheer</option>
 	         </select>
 	     </td></tr>
-	     <tr><td>Class Teacher</td><td><input type="text" name="cteacher" /></td></tr>
+	     <tr><td>Class Teacher</td><td><select name="cteacher">
+	     <?php 
+	         $res = mysql_query("SELECT `teacher_id`,`teacher_name` FROM `teachers`");
+		 while($row = mysql_fetch_assoc($res))
+	         echo "<option value=\"" . $row['teacher_id'] . "\">" . $row['teacher_name'] . "</option>\n";
+	     ?>
+	     </select></td></tr>
 	     <tr><td colspan="2"><input type="submit" value="Add Class"></td></tr>
     </form>
 <?php
@@ -164,6 +170,11 @@ function getClassCurriculum($classId) {
     return $row["curriculum"];
 }
 
+function getClassTeacher($classId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `teachers`.`teacher_name` FROM `classes`,`teachers` WHERE `classes`.`class_id` = '" . $classId . "' AND `classes`.`cteacher_id` = `teachers`.`teacher_id`"));
+    return $row["teacher_name"];
+}
+
 function editStudentMarks() {
     $classId   = $_GET['class'];
     $examId    = $_GET['exam'];
@@ -212,7 +223,7 @@ function editStudentMarks() {
 function getStudentsFromClass($examId) {
     $classId = $_GET['class'];
     $subjectArray = Array();
-    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a> <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
+    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a> <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - Class Teacher: " . getClassTeacher($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
 
     echo "<div id=\"options\">Options</div>";
     echo "<br>";

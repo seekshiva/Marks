@@ -1,3 +1,12 @@
+<?php
+include("connect.php");
+include("functions.lib.php");
+
+if(isset($_GET['teacher'])) {
+    mysql_query("INSERT INTO `teachers` (`teacher_name`) VALUES ('" . $_GET['teacher'] . "')");
+    header("Location: ./teachers.php");
+}
+?>
 <!doctype html>
 <html>
 <head>
@@ -9,11 +18,9 @@
     <a href="javascript:history.back(1)">Back</a><a href="./">Home</a><a href="./student.php">Students</a><a style="background-color:#e1e1f1; " href="./teachers.php">Teachers</a>
 </div>
 <?php
-include("connect.php");
-include("functions.lib.php");
 
 echo "<div class=\"block\">";
-echo "<form action=\"\" method=\"GET\"><label>Add New Teacher</label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
+echo "<form action=\"\" method=\"GET\"><label from=\"teacher\">Add New Teacher</label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
 echo "</div>";
 
 
