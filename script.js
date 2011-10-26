@@ -1,5 +1,5 @@
 var tabl;
-function filterStudents($tableId) {
+function setHouseInfo() {
     var str="";
     var x="";
 
@@ -26,8 +26,8 @@ function editStudents() {
     tabl = document.getElementById('studentsTable');
     n = tabl.getElementsByTagName("tr");
     for(var i=0;i<n.length;i++) {
-	if(n[i].childNodes[0].innerHTML != "" && n[i].childNodes[0].childNodes[0].checked) {
-	    x += "," + n[i].childNodes[0].childNodes[0].value;
+	if(n[i].childNodes[0].innerHTML != "" && n[i].childNodes[0].childNodes[1].checked) {
+	    x += "," + n[i].childNodes[0].childNodes[1].value;
 	}
     }
     x = x.substr(1);
@@ -46,3 +46,22 @@ function editStudents() {
     window.location = url;
     console.log("url: " + url);
 }
+
+function filter() {
+    fval = document.getElementById("filter").value;
+    rows = document.getElementById("studentsTable").getElementsByTagName("tr");
+    for(i=0;i<rows.length;++i) {
+	ch = rows[i].childNodes;
+	if(ch[ch.length-1].nodeName == "TD")
+	    if(ch[ch.length-1].innerHTML > fval) {
+		rows[i].parentNode.removeChild(rows[i]);
+	    }
+    }
+}
+
+
+$(document).ready(function() {
+    $("#options").click(function(e) {
+	$("#editor").slideToggle();
+    });
+});

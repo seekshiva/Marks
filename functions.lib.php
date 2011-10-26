@@ -56,19 +56,14 @@ function generateHousesList() {
 
 function addStudents() {
     if(isset($_POST['students'])) {
-        $a=Array();$b = Array();
-        //print_r($_POST);
-        $x = explode("\n",$_POST['students']);
-	for($i=0;$i<count($x);$i = $i+1) {
-	    $c = explode("-",$x[$i]);
-	    if(trim($c[0]) != "") $a[] = trim($c[0]);
-	    if(trim($c[1]) != "") $b[] = trim($c[1]);
-	}
+        $admNo = explode("\n",$_POST['admissonNo']);
+        $examNo = explode("\n",$_POST['examNo']);
+        $studentNo = explode("\n",$_POST['students']);
 	
-	$query = "INSERT INTO `marklist`.`students` (`adm_no`, `student_name`, `class_id`) VALUES ";
-	for($i=0;$i<count($a);$i=$i+1) {
+	$query = "INSERT INTO `students` (`adm_no`, `exam_no`, `student_name`, `class_id`) VALUES ";
+	for($i=0;$i<count($studentNo);$i=$i+1) {
 	    if($i != 0) $query .= ", ";
-	    $query .= "('" . $a[$i] . "', '" . $b[$i] . "','" . $_GET['class'] . "')";
+	    $query .= "('" . $admNo[$i] . "', '" . $examNo[$i] . "', '" . $studentNo[$i] . "','" . $_GET['class'] . "')";
 	}
 	$query .= ";";
 	mysql_query($query);
@@ -77,10 +72,11 @@ function addStudents() {
     else {
         ?>
 	<form action="" method="POST">
-	<table>
-	    <tr><td><label>Names of students: </label></td><td><textarea name="students" rows="20"></textarea></td></tr>
+	<table style="margin:20px; " cellspacing="0">
+	    <tr style="text-align:center; font-size:80%; "><td><label>Admission<br>Number</label></td><td><label>Exam Id</label></td><td><label>Names of students</label></td></tr>
+	    <tr><td><textarea name="admissonNo" rows="30" cols="5"></textarea></td><td><textarea name="examNo" rows="30" cols="5"></textarea></td><td><textarea name="students" rows="30"></textarea></td></tr>
 	    <tr><td><label></label></td><td></td></tr>
-	    <tr><td colspan="2" align="center"><input type="submit" value="Add Students"></td></tr>
+	    <tr><td colspan="3" align="center"><input type="submit" value="Add Students"></td></tr>
 	</table></form>
 	<?php
     }
@@ -100,7 +96,7 @@ function editStudentInfo() {
 
 function addClass() {
     if(isset($_POST['class'])) {
-        $query = "INSERT INTO `marklist`.`classes` (`class_id`, `class_name`, `curriculum`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['curriculum'] . "');";
+        $query = "INSERT INTO `classes` (`class_id`, `class_name`, `curriculum`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['curriculum'] . "');";
         mysql_query($query);
 	header("Location: ./");
     }
@@ -116,6 +112,7 @@ function addClass() {
 		     <option value="Samacheer">Samacheer</option>
 	         </select>
 	     </td></tr>
+	     <tr><td>Class Teacher</td><td><input type="text" name="cteacher" /></td></tr>
 	     <tr><td colspan="2"><input type="submit" value="Add Class"></td></tr>
     </form>
 <?php
@@ -152,104 +149,19 @@ function getClassName($classId) {
     return $row["class_name"];
 }
 
+function getExamName($examId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `exam_name` FROM `exams` WHERE `exam_id` = '" . $examId . "'"));
+    return $row["exam_name"];
+}
+
+function getSubjectName($subjectId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `coursecode`.`course_name` FROM `coursecode`,`subjects` WHERE `subjects`.`subject_id` = '" . $subjectId . "' AND `coursecode`.`course_code` = `subjects`.`course_id`"));
+    return $row["course_name"];
+}
+
 function getClassCurriculum($classId) {
     $row = mysql_fetch_array(mysql_query("SELECT `curriculum` FROM `classes` WHERE `class_id` = '" . $classId . "'"));
     return $row["curriculum"];
-}
-
-function getStudentsFromClass($examId) {
-    $classId = $_GET['class'];
-    $subjectArray = Array();
-    echo "<h3>Students in class " . getClassName($classId) . " <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
-
-    /**
-     *   The part where the list of courses taught in the class is listed
-    **/
-    
-    echo "<div class=\"block\">";
-    $res = mysql_query("SELECT `coursecode`.`course_code` AS `code`,`coursecode`.`course_name` AS `name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id`='" . $classId . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
-
-    if(mysql_num_rows($res) == 0) {
-       echo "No subjects found!";
-    }
-    else {
-    echo "<table style='margin:5px; ' border='1' cellspacing='0' cellpadding='3'><tr>";
-    while($row = mysql_fetch_array($res)) {
-        $subjectArray[$row['code']] = $row['name'];
-        echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
-    }
-    echo "</tr></table>";
-    }
-    $curriculum = getClassCurriculum($classId);
-    $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
-    echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
-    echo "<option value=\"0\">-</option>";
-    while($row = mysql_fetch_assoc($res)) {
-        echo "<option value=\"" . $row['course_code'] . "\">" . $row['course_name'] . "</option>";
-    }
-    echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
-    echo "</form></div>\n\n";
-
-    /**
-     *	The part where the list of exams is listed
-    **/
-    
-    echo "<div class=\"block\">";
-    $res = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
-    if(mysql_num_rows($res) == 0) {
-        echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
-    }
-    else {
-    echo "<select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
-    echo "<option value=\"0\">--Select an Exam from below--</option>";
-    while($row = mysql_fetch_assoc($res)) {
-    if($examId && $examId == $row['exam_id'])
-        echo "<option selected=\"true\" value=\"" . $row['exam_id'] . "\">" . $row['exam_name'] . "</option>";
-    else
-        echo "<option value=\"" . $row['exam_id'] . "\">" . $row['exam_name'] . "</option>";
-    }
-    echo "</select>";
-    }
-    echo "<form action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /><input type=\"submit\" value=\"Add\"></form>";
-    echo "</div>";
-
-    $res = mysql_query("SELECT `student_id`, `adm_no`, `student_name`, `team_id`, `house_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `student_id`");
-    if(mysql_num_rows($res) == 0) {
-        echo "<tr><td colspan=\"5\">No student found in the database!</td></tr>";
-	return;
-    }
-
-    echo "<script> window.onload = function() { filterStudents('editstudents'); }; </script>";
-
-    echo "With the below selected students, set <span id=\"listContainer\"></span>";
-    echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";
-    echo "<tr><th></th><th>Admission Number</th><th>Name</th><th>House</th><th>Team</th>";
-    if($examId != "") foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
-    echo "</tr>\n";
-
-    while($row = mysql_fetch_assoc($res)) {
-        $subjArr = Array();
-        $query2 = "SELECT `subject_id`,`marks` FROM `marks` WHERE `student_id` = '" . $row['student_id'] . "' AND `exam_id` = '" . $examId . "' ";
-	$res2 = mysql_query($query2);
-        while($row2 = mysql_fetch_assoc($res2))
-	{
-	    $subjArr[$row2['subject_id']] = $row2['marks'];
-	}
-        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><input type=\"checkbox\" name=\"studentid[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
-	if($examId!="")
-	foreach($subjectArray as $key=>$val ) {
-	    echo "<td>";
-	    if(isset($subjArr[$key])) {
-	        echo $subjArr[$key] . "<br />";
-	    }
-	    else {
-	        echo "not available<br />";
-	    }
-	    echo "</td>";
-	}
-	echo "</tr>";
-    }
-    echo "</table>";
 }
 
 function editStudentMarks() {
@@ -297,25 +209,234 @@ function editStudentMarks() {
     echo "</table><input type=\"hidden\" name=\"dummy\" value=\"1\"><input type=\"submit\" value=\"Add Marks\" /></form>";
 }
 
-function getStudentsFromTeam($teamId) {
-    echo "<h3>Students in team " . getTeamName($teamId) . "</h3>";
-    $res = mysql_query("SELECT `adm_no`, `student_name`, `class_id` FROM `students` WHERE `team_id` = '" . $teamId . "' ORDER BY `student_id`");
-    echo "<table cellpadding='5' cellspacing='0' border='1'>";
-    echo "<tr><th>Admission Number</th><th>Name</th><th>Class</th></tr>";
+function getStudentsFromClass($examId) {
+    $classId = $_GET['class'];
+    $subjectArray = Array();
+    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a> <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
+
+    echo "<div id=\"options\">Options</div>";
+    echo "<br>";
+    echo "<div style=\"display:none;\" id=\"editor\">";
+    
+    /**
+     *   The part where the list of courses taught in the class is listed
+    **/
+    
+    echo "<div class=\"block\">";
+    $res = mysql_query("SELECT `subjects`.`subject_id` AS `code`,`coursecode`.`course_name` AS `name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id`='" . $classId . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
+
+    if(mysql_num_rows($res) == 0) {
+       echo "No subjects found!";
+    }
+    else {
+    echo "<table style='margin:5px; ' border='1' cellspacing='0' cellpadding='3'><tr>";
+    while($row = mysql_fetch_array($res)) {
+        $subjectArray[$row['code']] = $row['name'];
+        echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
+    }
+    echo "</tr></table>";
+    }
+    $curriculum = getClassCurriculum($classId);
+    $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
+    echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
+    echo "<option value=\"0\">-</option>";
     while($row = mysql_fetch_assoc($res)) {
-        echo "<tr><td>" . $row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td>" . getClassName($row['class_id']) . "</td></tr>";
+        echo "<option value=\"" . $row['course_code'] . "\">" . $row['course_name'] . "</option>";
+    }
+    echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
+    echo "</form></div>\n\n";
+
+    $res = mysql_query("SELECT `student_id`, `exam_no`, `adm_no`, `student_name`, `team_id`, `house_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `exam_no` ASC");
+    if(mysql_num_rows($res) == 0) {
+        echo "<tr><td colspan=\"5\">No student found in the database!</td></tr>";
+	return;
+    }
+
+    echo "<script> window.onload = function() { setHouseInfo(); }; </script>";
+
+    echo "With the below selected students, set <span id=\"listContainer\"></span>";
+    
+    echo "</div><br/>";
+    
+    /**
+     *	The part where the list of exams is listed
+    **/
+    
+    echo "<div class=\"block\">";
+    $res2 = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
+    if(mysql_num_rows($res2) == 0) {
+        echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
+    }
+    else {
+    echo "<select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
+    echo "<option value=\"0\">--Select an Exam from below--</option>";
+    while($row2 = mysql_fetch_assoc($res2)) {
+    if($examId && $examId == $row2['exam_id'])
+        echo "<option selected=\"true\" value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+    else
+        echo "<option value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+    }
+    echo "</select>";
+    }
+    if($examId == 0) {
+        echo "<form action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /><input type=\"submit\" value=\"Add\"></form>";
+    }
+    else {
+        echo "<br>Filter students below <input type=\"text\" id=\"filter\" size=\"1\" maxlength=\"2\"value=\"90\">% <input type=\"button\" value=\"Go!\" onclick=\"filter(); \">";
+    }
+    
+    echo "</div>";
+
+    
+    echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";
+    echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th><th>House</th><th>Team</th>";
+    if($examId != 0) {
+        foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
+	echo "<th>Total</th><th>Average</th>";
+    }
+    echo "</tr>\n";
+
+    while($row = mysql_fetch_assoc($res)) {
+        $subjArr = Array();
+        $query2 = "SELECT `subject_id`,`marks` FROM `marks` WHERE `student_id` = '" . $row['student_id'] . "' AND `exam_id` = '" . $examId . "' ";
+	$res2 = mysql_query($query2);
+        while($row2 = mysql_fetch_assoc($res2))
+	{
+	    $subjArr[$row2['subject_id']] = $row2['marks'];
+	}
+        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
+	if($examId!=0) {
+	$count = 0;
+	$sum = 0;
+	foreach($subjectArray as $key=>$val ) {
+	    echo "<td>";
+	    if(isset($subjArr[$key])) {
+	        echo $subjArr[$key] . "<br />";
+		$count = $count + 1;
+		$sum = $sum + $subjArr[$key];
+	    }
+	    else {
+	        echo "not available<br />";
+	    }
+	    echo "</td>";
+	}
+	$avg = ($count) ? $sum/$count : 0;
+	$avg = substr($avg,0,strpos($avg,".") + 3);
+	echo "<td>" . $sum . "</td><td>" . $avg . "</td>";
+	}
+	echo "</tr>";
     }
     echo "</table>";
 }
 
 function getStudentsFromHouse($houseId) {
-    echo "<h3>Students in " . getHouseName($houseId) . " House</h3>";
-    $res = mysql_query("SELECT `adm_no`, `student_name`, `class_id` FROM `students` WHERE `house_id` = '" . $houseId . "' ORDER BY `student_id`");
-    echo "<table cellpadding='5' cellspacing='0' border='1'>";
-    echo "<tr><th>Admission<br> Number</th><th>Name</th><th>Class</th></tr>";
+    $houseId = $_GET['house'];
+    $classArr = Array();
+    if($houseId == 0) {
+        header("Location: ./");
+    }
+    if(isset($_POST['dummyvar'])) {
+        echo "<h3>" . getHouseName($_GET['house']) . " House</h3>";
+        $res = mysql_query("SELECT `students`.`class_id`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`house_id` = '{$houseId}' AND `classes`.`class_id` = `students`.`class_id` GROUP BY `students`.`class_id`");
+	while($row = mysql_fetch_assoc($res)) {
+	    if(! isset($_POST['class' . $row['class_id']])) continue;
+            $subjArr = Array();		      
+            $query2 = "SELECT DISTINCT(`subject_id`) FROM `marks` WHERE `exam_id` = '" . $_POST['class' . $row['class_id']] . "' ";
+	    $res2 = mysql_query($query2);
+            while($row2 = mysql_fetch_assoc($res2))
+	    {
+	        $subjArr[] = $row2['subject_id'];
+	    }
+            $marksArr = Array();
+	    echo "<h4>" . $row['class_name'] . " - " . getExamName($_POST['class' . $row['class_id']]) . "</h4>";
+	    //echo $_POST['class' . $row['class_id']];
+
+	    
+	    echo "<table border='1' cellspacing='0' cellpadding='3'>\n<tr><th>Admission<br>Number</th><th>Name</th>\n\n";
+	    foreach($subjArr as $key=>$val) echo "<th>" . getSubjectName($val) . "</th>";
+	    echo "</tr>\n\n";
+	    
+	    $query2 = "SELECT `students`.`student_id`, `students`.`adm_no`, `students`.`student_name`, `marks`.`subject_id`, `marks`.`marks` FROM `students`,`marks` WHERE `marks`.`exam_id` = '" . $_POST['class' . $row['class_id']] . "' AND `students`.`house_id` = '{$houseId}' AND `students`.`student_id` = `marks`.`student_id` ORDER BY `students`.`student_id`";
+	    $res2 = mysql_query($query2);
+	    while($row2 = mysql_fetch_assoc($res2)) {
+	        $marksArr[$row2['student_id']]["adm_no"] = $row2['adm_no'];
+	        $marksArr[$row2['student_id']]["name"] = $row2['student_name'];
+	        $marksArr[$row2['student_id']]["subject" . $row2['subject_id']] = $row2['marks'];
+	    }
+	    foreach($marksArr as $key=>$val) {
+	        echo "<tr><td>" . $val["adm_no"] . "</td><td>" . $val["name"] . "</td>";
+		foreach($subjArr as $key2=>$val2) echo "<td>" . $val["subject" . $val2 ] . "</td>";
+		echo "</tr>";
+	    }
+	    echo "</table>";
+
+	}
+        return;
+    }
+    $res = mysql_query("SELECT `students`.`class_id`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`house_id` = '{$houseId}' AND `classes`.`class_id` = `students`.`class_id` GROUP BY `students`.`class_id`");
+    $num = mysql_num_rows($res);
+    if($num == 0) {
+        echo "No student was found belonging to this class. Find the corresponding student in the class list and set house of the student there.";
+    }
+    else {
+    echo "<p>Students from <b>" . getHouseName($houseId) . " house</b> were found to be from ";
+    $flag = 0;
     while($row = mysql_fetch_assoc($res)) {
-        echo "<tr><td>" . $row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td>" . getClassName($row['class_id']) . "</td></tr>";
+        if($flag) echo ", ";
+	else $flag = 1;
+        echo $row['class_name'];
+	$classArr[$row['class_id']] = $row['class_name'];
+    }
+    echo ".</p>\n";
+    echo "Select the examination for each class from which the mark list of students have to be displayed:<br>\n";
+    echo "<form action=\"\" method=\"POST\"><table style='margin:10px; '>\n";
+    foreach($classArr as $key=> $val) {
+        echo "<tr><td>" . $val . "</td><td>";
+        $classId = $key;
+        $res = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
+        if(mysql_num_rows($res) == 0) {
+            echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
+        }
+    	else {
+	    echo "<select name=\"class{$key}\">\n";
+    	    echo "\t<option value=\"0\">--Select an Exam from below--</option>\n";
+    	    while($row = mysql_fetch_assoc($res)) {
+        	echo "\t<option value=\"" . $row['exam_id'] . "\">" . $row['exam_name'] . "</option>\n";
+	    }
+    	    echo "</select>";
+        }
+     	echo "</td></tr>\n";
+    }
+    echo "<tr><td colspan=\"2\" align=\"Center\">\n<input type=\"hidden\" name=\"dummyvar\" value=\"1\"><input type=\"submit\" value=\"Go!\"></td></tr>\n</table></form>\n";
+    
+    
+    $res = mysql_query("SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`house_id` = '{$houseId}' AND `classes`.`class_id` = `students`.`class_id` GROUP BY `students`.`class_id`");
+    if(mysql_num_rows($res) ==0) return;
+    echo "<h3>List of students in this house</h3>";
+    echo "<table border='1' cellspacing='0' cellpadding='4'><tr><th>Admission Number</th><th>Student Name</th><th>Class</th></tr>";
+    while($row = mysql_fetch_assoc($res)) {
+        echo "<tr><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td><td>" . $row['class_name'] . "</td></tr>";
     }
     echo "</table>";
+    }
+}
+
+function displayMarks($marksArr , $subjArr) {
+    if($marksArr["exam_id"] == -1) return;
+    $count = 0;
+    $sum   = 0;
+    echo "<tr><td>" . $marksArr['exam_name'] . "</td>";
+    foreach($subjArr as $key=>$val) {
+        if(!isset($marksArr[$key])) {
+	    echo "<td>-</td>";
+	    continue;
+	}
+	else echo "<td>" . $marksArr[$key] . "</td>";
+        $count = $count + 1;
+        $sum = $sum + $marksArr[$key];
+    }
+    $avg = $sum/$count;
+    $avg = substr($avg,0,strpos($avg,".") + 3);
+    echo "<td>{$sum}</td><td>{$avg}</td></tr>";
 }
 ?>

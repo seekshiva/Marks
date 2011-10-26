@@ -1,6 +1,6 @@
 <?php include("functions.lib.php"); ?>
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <title>JKDSHKJ</title>
 <link rel="stylesheet" href="main.css">
@@ -9,10 +9,13 @@ var classId = <?php echo isset($_GET['class'])?$_GET['class']:0; ?>,
 houses = [<?php echo getHousesList(); ?>],
 teams = [<?php echo getTeamsList(); ?>];
 </script>
+<script src="jquery.js"></script>
 <script src="script.js"></script>
 </head>
 <body>
-<a href="javascript:history.back(1)">Back</a> <a href="./">Home</a><br />
+<div id="menu">
+    <a href="javascript:history.back(1)">Back</a><a <?php if(count($_GET) == 0) echo "style=\"background-color:#e1e1f1;\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
+</div>
 <div id="wrapper">
 <?php
 if(isset($_GET['subject'])) {
@@ -55,9 +58,11 @@ else if(isset($_GET['house'])) {
     getStudentsFromHouse($_GET['house']);
 }
 else {
+    echo "<table style=\"vertical-align:top; \"><tr><td>";
     generateClassesList();
-    //generateTeamsList();
+    echo "</td><td>";
     generateHousesList();
+    echo "</td></tr></table>";
 }
 ?>
 </div>
