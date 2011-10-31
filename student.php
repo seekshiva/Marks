@@ -6,7 +6,7 @@
 </head>
 <body>
 <div id="menu">
-    <a href="javascript:history.back(1)">Back</a><a href="./">Home</a><a style="background-color:#e1e1f1; " href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
+    <a href="./">Home</a><a style="background-color:#e1e1f1; " href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
 </div>
 <?php
 include("connect.php");

@@ -15,7 +15,7 @@ if(isset($_GET['teacher'])) {
 </head>
 <body>
 <div id="menu">
-    <a href="javascript:history.back(1)">Back</a><a href="./">Home</a><a href="./student.php">Students</a><a style="background-color:#e1e1f1; " href="./teachers.php">Teachers</a>
+    <a href="./">Home</a><a href="./student.php">Students</a><a style="background-color:#e1e1f1; " href="./teachers.php">Teachers</a>
 </div>
 <?php
 
