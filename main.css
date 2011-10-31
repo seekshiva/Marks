@@ -1,4 +1,5 @@
 body {font-size:1em; margin:0; }
+#wrapper {padding:5px; }
 
 a {text-decoration:none; }
 a:hover {text-decoration:underline; }
@@ -8,14 +9,15 @@ a:visited {color:#00E; }
 .closeButton:hover {color:#00e; background-color:#aab; text-decoration:none; }
 
 #menu {border-bottom:2px solid #77c; height:30px;  }
-#menu a {padding:3px; margin:0; display:inline-block; }
-#menu a:hover {background-color:#eef; }
-#menu a {padding:5px; }
+#menu a {padding:5px; padding-bottom:6px; margin:0; display:inline-block; }
+#menu a:hover {text-decoration:none; padding-bottom:6px; background-color:#eef; border-bottom:2px solid #ccd; }
+#currentMenuItem {background-color:#e1e1f1; border-bottom:2px solid #ccd; }
+#menu a#currentMenuItem:hover {background-color:#e1e1f1; border-bottom:2px solid #eef; }
 
 #editor {margin-bottom:30px; }
 #subjList {margin:5px; cursor:default; font-size:70%; }
 #subjList td { }
-#subjList td:hover {background-color:#aad; }
+#subjList td:hover {color:#fff; background-color:#aad; }
 #subjList td .closeButton {visibility:hidden; }
 #subjList td:hover .closeButton {visibility:visible; }
 

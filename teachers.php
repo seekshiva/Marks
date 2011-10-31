@@ -15,8 +15,9 @@ if(isset($_GET['teacher'])) {
 </head>
 <body>
 <div id="menu">
-    <a href="./">Home</a><a href="./student.php">Students</a><a style="background-color:#e1e1f1; " href="./teachers.php">Teachers</a>
+    <a href="./">Home</a><a href="./student.php">Students</a><a id="currentMenuItem" href="./teachers.php">Teachers</a>
 </div>
+<div id="wrapper">
 <?php
 
 echo "<div class=\"block\">";
@@ -38,6 +39,6 @@ echo "</ul>";
 }
 echo "</div>";
 ?>
-
+</div>
 </body>
 </html>

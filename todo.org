@@ -4,6 +4,8 @@
 * For each class, select the list of courses being taught
 * Enter the list of students for each class
 
+* student info is not available if no team or house info is available about the student
+
 * mentor
 * subject wise centum list
 * attendance report - term-wise and total attendance

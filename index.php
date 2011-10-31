@@ -14,7 +14,7 @@ teams = [<?php echo getTeamsList(); ?>];
 </head>
 <body>
 <div id="menu">
-    <a <?php if(count($_GET) == 0) echo "style=\"background-color:#e1e1f1;\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
+    <a <?php if(count($_GET) == 0) echo "id=\"currentMenuItem\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
 </div>
 <div id="wrapper">
 <?php
@@ -58,7 +58,7 @@ else if(isset($_GET['house'])) {
     getStudentsFromHouse($_GET['house']);
 }
 else {
-    echo "<table style=\"vertical-align:top; \"><tr><td>";
+    echo "<table cellspacing=\"30\" style=\"vertical-align:top; \"><tr><td>";
     generateClassesList();
     echo "</td><td>";
     generateHousesList();

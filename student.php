@@ -6,15 +6,18 @@
 </head>
 <body>
 <div id="menu">
-    <a href="./">Home</a><a style="background-color:#e1e1f1; " href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
+    <a href="./">Home</a><a id="currentMenuItem" href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
 </div>
+<div id="wrapper">
 <?php
 include("connect.php");
 include("functions.lib.php");
 if(isset($_GET['sid'])) {
+   //$query = "SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`classes`.`class_id`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`student_id` = '" . $_GET['sid'] . "' AND `classes`.`class_id` = `students`.`class_id`";
    $query = "SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`classes`.`class_id`,`classes`.`class_name`,`teams`.`team_name`,`houses`.`house_name` FROM `students`,`classes`,`teams`,`houses` WHERE `students`.`student_id` = '" . $_GET['sid'] . "' AND `classes`.`class_id` = `students`.`class_id` AND `teams`.`team_id` = `students`.`team_id` AND `houses`.`house_id` = `students`.`house_id`";
    //echo $query;
    $res = mysql_query($query);
+   if(mysql_num_rows($res) == 0) die("Not a valid student id or the house and team info about the student has not been listed yet!");
    $row = mysql_fetch_assoc($res);
    $classId = $row['class_id'];
    echo "<h3>" . $row['student_name'] . " - Student Info</h3>";
@@ -32,12 +35,14 @@ if(isset($_GET['sid'])) {
        $subjArr[$row2['subject_id']] = $row2['course_name'];
    }
    
+   $query = "SELECT `marks`.`student_id`,`marks`.`exam_id`,`exams`.`exam_name`,`marks`.`subject_id`,`marks`.`marks` FROM `marks`,`exams` WHERE `marks`.`exam_id` = `exams`.`exam_id` AND `marks`.`student_id` = '" . $row['student_id'] . "' ORDER BY `marks`.`exam_id` ASC";
+   $res = mysql_query($query);
+   if(mysql_num_rows($res) == 0) die("The student has not written any exam yet!");
+
    echo "<br /><table style='text-align:center' border='1' cellpadding='3' cellspacing='0'>\n<tr><th>Examination</th>";
    foreach($subjArr as $key=>$val) echo "<th>" . $val . "</th>";
    echo "<th>Total</th><th>Percentage</th></tr>\n";
 
-   $query = "SELECT `marks`.`student_id`,`marks`.`exam_id`,`exams`.`exam_name`,`marks`.`subject_id`,`marks`.`marks` FROM `marks`,`exams` WHERE `marks`.`exam_id` = `exams`.`exam_id` AND `marks`.`student_id` = '" . $row['student_id'] . "' ORDER BY `marks`.`exam_id` ASC";
-   $res = mysql_query($query);
    $marksArr = Array();
    $marksArr["exam_id"] = -1;
    while($row = mysql_fetch_assoc($res)) {
@@ -56,11 +61,12 @@ if(isset($_GET['sid'])) {
    echo "</table>";
 }
 else {
-    echo "<h3>Student Information Rretrieval System</h3>";
+    echo "<h3>Student Information Retrieval System</h3>";
     echo "<form action=\"\" method=\"GET\">Enter Student Id : <input type=\"text\" name=\"sid\" /> <input type=\"submit\" value=\"Go!\"></form><br>";
     echo "Or you could click on the student name from the class or house list, to access information about the student.";
 }
 
 ?>
+</div>
 </body>
 </head>
