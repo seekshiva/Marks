@@ -63,5 +63,17 @@ function filter() {
 $(document).ready(function() {
     $("#options").click(function(e) {
 	$("#editor").slideToggle();
+	if(localStorage["optionDown"] == "1") {
+	    localStorage["optionDown"] = 0;
+	}
+	else {
+	    localStorage["optionDown"] = "1";
+	}
+
     });
+    if(localStorage) {
+	if(localStorage["optionDown"] == "1") {
+	    $("#editor").slideDown(0);
+	}
+    }
 });

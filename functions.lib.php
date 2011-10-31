@@ -172,7 +172,7 @@ function getClassCurriculum($classId) {
 
 function getClassTeacher($classId) {
     $row = mysql_fetch_array(mysql_query("SELECT `teachers`.`teacher_name` FROM `classes`,`teachers` WHERE `classes`.`class_id` = '" . $classId . "' AND `classes`.`cteacher_id` = `teachers`.`teacher_id`"));
-    return $row["teacher_name"];
+    return ($row["teacher_name"])?$row["teacher_name"]:"not set";
 }
 
 function editStudentMarks() {
@@ -210,12 +210,13 @@ function editStudentMarks() {
         $marksArr[$row['student_id']] = $row['marks'];
     }
     
-    $res = mysql_query("SELECT `adm_no`,`student_id`,`student_name` FROM `students` WHERE `class_id` = '" . $classId . "'");
+    $res = mysql_query("SELECT `adm_no`,`exam_no`,`student_id`,`student_name` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `exam_no` ASC");
     echo "<style>input[type='text'] {background-color:#dde; border:#fff; padding:3px;  }</style>";
     echo "<form action=\"\" method=\"POST\">";
     echo "<table border='1' cellspacing='0'>\n";
+    echo "<tr><th>Exam<br>Number</th><th>Admission<br>Number</th><th>Name</th><th>Marks</th></tr>\n";
     while($row = mysql_fetch_assoc($res)) {
-        echo "<tr><td>" .$row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td><input type=\"text\" name=\"" . $row['student_id'] . "\" value=\"" . (isset($marksArr[$row['student_id']])? $marksArr[$row['student_id']] : "0")  . "\" ></td></tr>\n";
+        echo "<tr><td>" .$row['exam_no'] . "</td><td>" .$row['adm_no'] . "</td><td>" . $row['student_name'] . "</td><td><input type=\"text\" name=\"" . $row['student_id'] . "\" value=\"" . (isset($marksArr[$row['student_id']])? $marksArr[$row['student_id']] : "0")  . "\" ></td></tr>\n";
     }
     echo "</table><input type=\"hidden\" name=\"dummy\" value=\"1\"><input type=\"submit\" value=\"Add Marks\" /></form>";
 }
@@ -223,11 +224,8 @@ function editStudentMarks() {
 function getStudentsFromClass($examId) {
     $classId = $_GET['class'];
     $subjectArray = Array();
-    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a> <br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . " - Class Teacher: " . getClassTeacher($classId) . " - <a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
+    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . "<br />Class Teacher: " . getClassTeacher($classId) . "<br /><a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
 
-    echo "<div id=\"options\">Options</div>";
-    echo "<br>";
-    echo "<div style=\"display:none;\" id=\"editor\">";
     
     /**
      *   The part where the list of courses taught in the class is listed
@@ -240,13 +238,17 @@ function getStudentsFromClass($examId) {
        echo "No subjects found!";
     }
     else {
-    echo "<table style='margin:5px; ' border='1' cellspacing='0' cellpadding='3'><tr>";
+    echo "<table id=\"subjList\" border='1' cellspacing='0' cellpadding='3'><tr>";
     while($row = mysql_fetch_array($res)) {
         $subjectArray[$row['code']] = $row['name'];
         echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
     }
     echo "</tr></table>";
     }
+    echo "</div>";
+    echo "<div id=\"options\">Options</div>";
+    echo "<br>";
+    echo "<div style=\"display:none;\" id=\"editor\">";
     $curriculum = getClassCurriculum($classId);
     $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
     echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
@@ -256,6 +258,7 @@ function getStudentsFromClass($examId) {
     }
     echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
     echo "</form></div>\n\n";
+
 
     $res = mysql_query("SELECT `student_id`, `exam_no`, `adm_no`, `student_name`, `team_id`, `house_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `exam_no` ASC");
     if(mysql_num_rows($res) == 0) {
@@ -267,7 +270,6 @@ function getStudentsFromClass($examId) {
 
     echo "With the below selected students, set <span id=\"listContainer\"></span>";
     
-    echo "</div><br/>";
     
     /**
      *	The part where the list of exams is listed
@@ -303,7 +305,7 @@ function getStudentsFromClass($examId) {
     echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th><th>House</th><th>Team</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
-	echo "<th>Total</th><th>Average</th>";
+	echo "<th>Total</th><th>Average</th><th>Pass/Fail Status</th>";
     }
     echo "</tr>\n";
 
@@ -318,11 +320,13 @@ function getStudentsFromClass($examId) {
         echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
 	if($examId!=0) {
 	$count = 0;
-	$sum = 0;
+	$sum   = 0;
+	$fail  = 0;
 	foreach($subjectArray as $key=>$val ) {
 	    echo "<td>";
 	    if(isset($subjArr[$key])) {
-	        echo $subjArr[$key] . "<br />";
+	        echo $subjArr[$key];
+		if($subjArr[$key] < 35 ) $fail = 1;
 		$count = $count + 1;
 		$sum = $sum + $subjArr[$key];
 	    }
@@ -333,7 +337,9 @@ function getStudentsFromClass($examId) {
 	}
 	$avg = ($count) ? $sum/$count : 0;
 	$avg = substr($avg,0,strpos($avg,".") + 3);
-	echo "<td>" . $sum . "</td><td>" . $avg . "</td>";
+	echo "<td>" . $sum . "</td><td>" . $avg . "</td><td>";
+	if($fail) echo "FAIL"; else echo "PASS";
+	echo "</td>";
 	}
 	echo "</tr>";
     }
@@ -365,7 +371,7 @@ function getStudentsFromHouse($houseId) {
 	    
 	    echo "<table border='1' cellspacing='0' cellpadding='3'>\n<tr><th>Admission<br>Number</th><th>Name</th>\n\n";
 	    foreach($subjArr as $key=>$val) echo "<th>" . getSubjectName($val) . "</th>";
-	    echo "</tr>\n\n";
+	    echo "<th>Total</th><th>Average</th></tr>\n\n";
 	    
 	    $query2 = "SELECT `students`.`student_id`, `students`.`adm_no`, `students`.`student_name`, `marks`.`subject_id`, `marks`.`marks` FROM `students`,`marks` WHERE `marks`.`exam_id` = '" . $_POST['class' . $row['class_id']] . "' AND `students`.`house_id` = '{$houseId}' AND `students`.`student_id` = `marks`.`student_id` ORDER BY `students`.`student_id`";
 	    $res2 = mysql_query($query2);
@@ -376,8 +382,16 @@ function getStudentsFromHouse($houseId) {
 	    }
 	    foreach($marksArr as $key=>$val) {
 	        echo "<tr><td>" . $val["adm_no"] . "</td><td>" . $val["name"] . "</td>";
-		foreach($subjArr as $key2=>$val2) echo "<td>" . $val["subject" . $val2 ] . "</td>";
-		echo "</tr>";
+		$sum = 0;
+		$count = 0;
+		foreach($subjArr as $key2=>$val2) {
+		    echo "<td>" . $val["subject" . $val2 ] . "</td>";
+		    $count = $count + 1;
+		    $sum = $sum + $val["subject" . $val2 ];
+		}
+		$avg = $count? $sum/$count : 0;
+    		$avg = substr($avg,0,strpos($avg,".") + 3);
+    		echo "<td>{$sum}</td><td>{$avg}</td></tr>";
 	    }
 	    echo "</table>";
 
@@ -446,7 +460,7 @@ function displayMarks($marksArr , $subjArr) {
         $count = $count + 1;
         $sum = $sum + $marksArr[$key];
     }
-    $avg = $sum/$count;
+    $avg = $count ? $sum/$count : 0;
     $avg = substr($avg,0,strpos($avg,".") + 3);
     echo "<td>{$sum}</td><td>{$avg}</td></tr>";
 }

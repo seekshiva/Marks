@@ -14,7 +14,7 @@ teams = [<?php echo getTeamsList(); ?>];
 </head>
 <body>
 <div id="menu">
-    <a href="javascript:history.back(1)">Back</a><a <?php if(count($_GET) == 0) echo "style=\"background-color:#e1e1f1;\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
+    <a <?php if(count($_GET) == 0) echo "style=\"background-color:#e1e1f1;\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
 </div>
 <div id="wrapper">
 <?php

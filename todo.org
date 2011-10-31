@@ -3,3 +3,8 @@
 * Create all classes in the home page
 * For each class, select the list of courses being taught
 * Enter the list of students for each class
+
+* mentor
+* subject wise centum list
+* attendance report - term-wise and total attendance
+* sort accoding to rank

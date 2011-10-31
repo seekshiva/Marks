@@ -3,7 +3,7 @@ body {font-size:1em; margin:0; }
 a {text-decoration:none; }
 a:hover {text-decoration:underline; }
 a:visited {color:#00E; }
-.closeButton {font-weight:bold; padding:2px; background-color:#77e; color:#dde; }
+.closeButton {font-weight:bold; padding:2px; background-color:#46b; color:#dde; }
 .closeButton:visited {background-color:#77e; color:#dde; }
 .closeButton:hover {color:#00e; background-color:#aab; text-decoration:none; }
 
@@ -11,6 +11,13 @@ a:visited {color:#00E; }
 #menu a {padding:3px; margin:0; display:inline-block; }
 #menu a:hover {background-color:#eef; }
 #menu a {padding:5px; }
+
+#editor {margin-bottom:30px; }
+#subjList {margin:5px; cursor:default; font-size:70%; }
+#subjList td { }
+#subjList td:hover {background-color:#aad; }
+#subjList td .closeButton {visibility:hidden; }
+#subjList td:hover .closeButton {visibility:visible; }
 
 .s {font-size:70%; }
 th {font-size:80%; }
