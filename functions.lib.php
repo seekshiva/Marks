@@ -232,23 +232,11 @@ function getStudentsFromClass($examId) {
     **/
     
     echo "<div class=\"block\">";
-    $res = mysql_query("SELECT `subjects`.`subject_id` AS `code`,`coursecode`.`course_name` AS `name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id`='" . $classId . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
+    
+    echo "<div id=\"options\">";
+    echo "<div id=\"optionHead\">Options</div><br />";
+    echo "<div style=\"display:none;\" id=\"optionBody\">";
 
-    if(mysql_num_rows($res) == 0) {
-       echo "No subjects found!";
-    }
-    else {
-    echo "<table id=\"subjList\" border='1' cellspacing='0' cellpadding='3'><tr>";
-    while($row = mysql_fetch_array($res)) {
-        $subjectArray[$row['code']] = $row['name'];
-        echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
-    }
-    echo "</tr></table>";
-    }
-    echo "</div>";
-    echo "<div id=\"options\">Options</div>";
-    echo "<br>";
-    echo "<div style=\"display:none;\" id=\"editor\">";
     $curriculum = getClassCurriculum($classId);
     $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
     echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
@@ -257,7 +245,23 @@ function getStudentsFromClass($examId) {
         echo "<option value=\"" . $row['course_code'] . "\">" . $row['course_name'] . "</option>";
     }
     echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
-    echo "</form></div>\n\n";
+    echo "</form></div></div>\n\n";
+
+
+    $res = mysql_query("SELECT `subjects`.`subject_id` AS `code`,`coursecode`.`course_name` AS `name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id`='" . $classId . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
+    if(mysql_num_rows($res) == 0) {
+        echo "No subjects found!";
+    }
+    else {
+        echo "<table id=\"subjList\" border='1' cellspacing='0' cellpadding='3'><tr>";
+    	while($row = mysql_fetch_array($res)) {
+            $subjectArray[$row['code']] = $row['name'];
+            echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
+    	}
+    	echo "</tr></table>";
+    }
+    echo "</div>";
+
 
 
     $res = mysql_query("SELECT `student_id`, `exam_no`, `adm_no`, `student_name`, `team_id`, `house_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `exam_no` ASC");
@@ -267,7 +271,6 @@ function getStudentsFromClass($examId) {
     }
 
     echo "<script> window.onload = function() { setHouseInfo(); }; </script>";
-
     echo "With the below selected students, set <span id=\"listContainer\"></span>";
     
     

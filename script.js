@@ -62,7 +62,7 @@ function filter() {
 
 $(document).ready(function() {
     $("#options").click(function(e) {
-	$("#editor").slideToggle();
+	$("#optionBody").slideToggle(0);
 	if(localStorage["optionDown"] == "1") {
 	    localStorage["optionDown"] = 0;
 	}
@@ -73,7 +73,7 @@ $(document).ready(function() {
     });
     if(localStorage) {
 	if(localStorage["optionDown"] == "1") {
-	    $("#editor").slideDown(0);
+	    $("#optionBody").slideDown(0);
 	}
     }
 });
