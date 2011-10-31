@@ -170,9 +170,19 @@ function getClassCurriculum($classId) {
     return $row["curriculum"];
 }
 
+function getMentorName($studentId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `teachers`.`teacher_id`, `teachers`.`teacher_name` FROM `students`,`teachers` WHERE `students`.`student_id` = '" . $studentId . "' AND `students`.`mentor_id` = `teachers`.`teacher_id`"));
+    return ($row["teacher_name"])?"<a href=\"./teachers.php?teacherid=" . $row['teacher_id'] . "\">" . $row["teacher_name"] . "</a>":"not set";
+}
+
 function getClassTeacher($classId) {
     $row = mysql_fetch_array(mysql_query("SELECT `teachers`.`teacher_name` FROM `classes`,`teachers` WHERE `classes`.`class_id` = '" . $classId . "' AND `classes`.`cteacher_id` = `teachers`.`teacher_id`"));
     return ($row["teacher_name"])?$row["teacher_name"]:"not set";
+}
+
+function getClassTeacherLink($classId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `teachers`.`teacher_id`, `teachers`.`teacher_name` FROM `classes`,`teachers` WHERE `classes`.`class_id` = '" . $classId . "' AND `classes`.`cteacher_id` = `teachers`.`teacher_id`"));
+    return ($row["teacher_name"])? "<a href=\"./teachers.php?teacherid=" . $row['teacher_id'] . "\">" . $row["teacher_name"] . "</a>":"not set";
 }
 
 function editStudentMarks() {
@@ -304,11 +314,12 @@ function getStudentsFromClass($examId) {
 
     
     echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";
-    echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th><th>House</th><th>Team</th>";
+    echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
 	echo "<th>Total</th><th>Average</th><th>Pass/Fail Status</th>";
     }
+    else echo "<th>Mentor</th><th>House</th><th>Team</th>";
     echo "</tr>\n";
 
     while($row = mysql_fetch_assoc($res)) {
@@ -319,29 +330,32 @@ function getStudentsFromClass($examId) {
 	{
 	    $subjArr[$row2['subject_id']] = $row2['marks'];
 	}
-        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
-	if($examId!=0) {
-	$count = 0;
-	$sum   = 0;
-	$fail  = 0;
-	foreach($subjectArray as $key=>$val ) {
-	    echo "<td>";
-	    if(isset($subjArr[$key])) {
-	        echo $subjArr[$key];
-		if($subjArr[$key] < 35 ) $fail = 1;
-		$count = $count + 1;
-		$sum = $sum + $subjArr[$key];
-	    }
-	    else {
-	        echo "not available<br />";
-	    }
-	    echo "</td>";
+        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td>";
+	if($examId == 0) {
+	    echo "<td>" . getMentorName($row["student_id"]) . "</td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
 	}
-	$avg = ($count) ? $sum/$count : 0;
-	$avg = substr($avg,0,strpos($avg,".") + 3);
-	echo "<td>" . $sum . "</td><td>" . $avg . "</td><td>";
-	if($fail) echo "FAIL"; else echo "PASS";
-	echo "</td>";
+	else {
+	    $count = 0;
+	    $sum   = 0;
+	    $fail  = 0;
+	    foreach($subjectArray as $key=>$val ) {
+	        echo "<td>";
+	    	if(isset($subjArr[$key])) {
+	            echo $subjArr[$key];
+		    if($subjArr[$key] < 35 ) $fail = 1;
+		    $count = $count + 1;
+		    $sum = $sum + $subjArr[$key];
+	    	}
+	    	else {
+	            echo "not available<br />";
+	    	}
+	    	echo "</td>";
+	    }
+	    $avg = ($count) ? $sum/$count : 0;
+	    $avg = substr($avg,0,strpos($avg,".") + 3);
+	    echo "<td>" . $sum . "</td><td>" . $avg . "</td><td>";
+	    if($fail) echo "FAIL"; else echo "PASS";
+	    echo "</td>";
 	}
 	echo "</tr>";
     }

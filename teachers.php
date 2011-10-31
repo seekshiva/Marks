@@ -20,24 +20,50 @@ if(isset($_GET['teacher'])) {
 <div id="wrapper">
 <?php
 
-echo "<div class=\"block\">";
-echo "<form action=\"\" method=\"GET\"><label from=\"teacher\">Add New Teacher</label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
-echo "</div>";
-
-
-echo "<div class=\"block\">";
-$res = mysql_query("SELECT * FROM `teachers`");
-if(mysql_num_rows($res) == 0) {
-    echo "No teacher found in the database";
+if(isset($_GET['teacherid'])) {
+    $res = mysql_query("SELECT * FROM `teachers` WHERE `teacher_id` = '" . $_GET['teacherid'] . "'");
+    if(mysql_num_rows($res) == 0) {
+        header("Location: ./teachers.php");
+    }
+    else {
+        $row = mysql_fetch_assoc($res);
+	echo "<table><tr><td>";
+	echo "<img height=\"70px\" src=\"./default.jpg\"></td><td style=\"font-size:80%; \"><h3 style=\"margin:0; \">" . $row["teacher_name"] . " (" . $row["teacher_code"] . ")</h3>";
+	$res2 = mysql_query("SELECT `class_id`,`class_name` FROM `classes` WHERE `cteacher_id` = '" . $row["teacher_id"] . "'");
+	if(mysql_num_rows($res2) > 0) {
+	    $row2 = mysql_fetch_assoc($res2);
+	    echo "is the class teacher of <a href=\"./?class=" . $row2["class_id"] . "\">" . $row2["class_name"] . "</a><br />";
+	}
+	$res2 = mysql_query("SELECT `student_id`,`student_name` FROM `students` WHERE `mentor_id` = '" . $row["teacher_id"] . "'");
+	if(mysql_num_rows($res2) > 0) {
+	    echo "is the personal mentor for <ul style=\"margin:0; \">";
+	    while($row2 = mysql_fetch_assoc($res2)) {
+	    	echo "<li><a href=\"./student.php?student=" . $row2["student_id"] . "\">" . $row2["student_name"] . "</a></li>";
+	    }
+	    echo "</ul>";
+	}
+	
+	
+	echo "</td></tr></table>";
+    }
 }
 else {
-echo "<ul>";
-while($row = mysql_fetch_assoc($res)) {
-    echo "<li>" . $row['teacher_name'] . "</li>";
+    echo "<div class=\"block\">";
+    echo "<form action=\"\" method=\"GET\"><label from=\"teacher\">Add New Teacher</label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
+    echo "</div>";
+    
+    $res = mysql_query("SELECT * FROM `teachers`");
+    if(mysql_num_rows($res) == 0) {
+        echo "No teacher found in the database";
+    }
+    else {
+        echo "<ul>";
+    	while($row = mysql_fetch_assoc($res)) {
+    	    echo "<li><a href=\"./teachers.php?teacherid=" . $row["teacher_id"] . "\">" . $row['teacher_name'] . "</a></li>";
+    	}
+    	echo "</ul>";
+    }
 }
-echo "</ul>";
-}
-echo "</div>";
 ?>
 </div>
 </body>
