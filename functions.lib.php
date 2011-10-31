@@ -271,8 +271,6 @@ function getStudentsFromClass($examId) {
     }
 
     echo "<script> window.onload = function() { setHouseInfo(); }; </script>";
-    echo "With the below selected students, set <span id=\"listContainer\"></span>";
-    
     
     /**
      *	The part where the list of exams is listed
@@ -302,6 +300,7 @@ function getStudentsFromClass($examId) {
     }
     
     echo "</div>";
+    echo "With the below selected students, set <span id=\"listContainer\"></span>";
 
     
     echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";

@@ -61,7 +61,7 @@ function filter() {
 
 
 $(document).ready(function() {
-    $("#options").click(function(e) {
+    $("#optionHead").click(function(e) {
 	$("#optionBody").slideToggle(0);
 	if(localStorage["optionDown"] == "1") {
 	    localStorage["optionDown"] = 0;
