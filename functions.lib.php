@@ -25,7 +25,6 @@ function getTeamsList() {
 }
 
 function generateClassesList() {
-    echo "<h3>Classes: <span class=\"s\">[<a href=\"./?addclass=1\">Add a new class to the list</a>]</span></h3>";
     $res = mysql_query("SELECT * FROM `classes` WHERE 1 ORDER BY `class_id`");
     echo "<ul>";
     while($row = mysql_fetch_assoc($res)) {
@@ -234,7 +233,7 @@ function editStudentMarks() {
 function getStudentsFromClass($examId) {
     $classId = $_GET['class'];
     $subjectArray = Array();
-    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . "<br />Class Teacher: " . getClassTeacher($classId) . "<br /><a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
+    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . "<br />Class Teacher: " . getClassTeacherLink($classId) . "<br /><a href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a></span></h3>";
 
     
     /**

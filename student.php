@@ -31,7 +31,7 @@ if(isset($_GET['sid'])) {
    echo "<h3 style=\"margin:0;\">" . $row['student_name'] . "</h3>";
    echo "<div style=\"font-size:70%; \">";
    echo "is from class <b><a href=\"./?class=" . $row['class_id'] . "\">" . $row['class_name'] . "</a></b>.<br />";
-   echo $genderPrefix . " Class Teacher is <b>" . getClassTeacherLink($row['class_id']) . "</b> and " . $genderPrefix . " personal mentor is " . getMentorName($row['student_id']) . ".<br />";
+   echo $genderPrefix . " Class Teacher is <b>" . getClassTeacherLink($row['class_id']) . "</b> and " . $genderPrefix . " personal mentor is <b>" . getMentorName($row['student_id']) . "</b>.<br />";
    echo "Admission Number: <b>" . $row['adm_no'] . "</b><br />";
    echo "<b>" . $row['house_name'] . "</b> House<br />Team <b>" . $row['team_name'] . "</b><br />";
    echo "</div></td></tr></table>";
@@ -71,7 +71,9 @@ if(isset($_GET['sid'])) {
 else {
     echo "<h3>Student Information Retrieval System</h3>";
     echo "<form action=\"\" method=\"GET\">Enter Student Id : <input type=\"text\" name=\"sid\" /> <input type=\"submit\" value=\"Go!\"></form><br>";
-    echo "Or you could click on the student name from the class or house list, to access information about the student.";
+    echo "Or select a student from the class list displayed below";
+    echo "<h3>Classes:</h3>";
+    generateClassesList();
 }
 
 ?>

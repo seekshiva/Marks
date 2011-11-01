@@ -38,7 +38,7 @@ if(isset($_GET['teacherid'])) {
 	if(mysql_num_rows($res2) > 0) {
 	    echo "is the personal mentor for <ul style=\"margin:0; \">";
 	    while($row2 = mysql_fetch_assoc($res2)) {
-	    	echo "<li><a href=\"./student.php?student=" . $row2["student_id"] . "\">" . $row2["student_name"] . "</a></li>";
+	    	echo "<li><a href=\"./student.php?sid=" . $row2["student_id"] . "\">" . $row2["student_name"] . "</a></li>";
 	    }
 	    echo "</ul>";
 	}
@@ -48,21 +48,21 @@ if(isset($_GET['teacherid'])) {
     }
 }
 else {
-    echo "<div class=\"block\">";
-    echo "<form action=\"\" method=\"GET\"><label from=\"teacher\">Add New Teacher</label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
-    echo "</div>";
-    
     $res = mysql_query("SELECT * FROM `teachers`");
     if(mysql_num_rows($res) == 0) {
         echo "No teacher found in the database";
     }
     else {
+        echo "List of teachers:";
         echo "<ul>";
     	while($row = mysql_fetch_assoc($res)) {
     	    echo "<li><a href=\"./teachers.php?teacherid=" . $row["teacher_id"] . "\">" . $row['teacher_name'] . " <b>(" . $row["teacher_code"] . ")</b></a></li>";
     	}
     	echo "</ul>";
     }
+    echo "<div class=\"block\">";
+    echo "<form action=\"\" method=\"GET\"><label class=\"s\" from=\"teacher\">Add New Teacher to the list: </label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
+    echo "</div>";
 }
 ?>
 </div>

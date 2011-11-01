@@ -59,6 +59,7 @@ else if(isset($_GET['house'])) {
 }
 else {
     echo "<table cellspacing=\"30\" style=\"vertical-align:top; \"><tr><td>";
+    echo "<h3>Classes: <span class=\"s\">[<a href=\"./?addclass=1\">Add a new class to the list</a>]</span></h3>";
     generateClassesList();
     echo "</td><td>";
     generateHousesList();
