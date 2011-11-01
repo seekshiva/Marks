@@ -59,7 +59,7 @@ else {
     else {
         echo "<ul>";
     	while($row = mysql_fetch_assoc($res)) {
-    	    echo "<li><a href=\"./teachers.php?teacherid=" . $row["teacher_id"] . "\">" . $row['teacher_name'] . "</a></li>";
+    	    echo "<li><a href=\"./teachers.php?teacherid=" . $row["teacher_id"] . "\">" . $row['teacher_name'] . " <b>(" . $row["teacher_code"] . ")</b></a></li>";
     	}
     	echo "</ul>";
     }
