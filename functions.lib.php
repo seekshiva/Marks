@@ -306,14 +306,14 @@ function getStudentsFromClass($examId) {
         echo "<form action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /><input type=\"submit\" value=\"Add\"></form>";
     }
     else {
-        echo "<br>Filter students below <input type=\"text\" id=\"filter\" size=\"1\" maxlength=\"2\"value=\"90\">% <input type=\"button\" value=\"Go!\" onclick=\"filter(); \">";
+        echo " <a href=\"./classanalysis.php?class=" . $_GET['class'] . "&exam=" . $_GET['exam'] . "\">See analysis of the exam</a>";
     }
     
     echo "</div>";
-    echo "With the below selected students, set <span id=\"listContainer\"></span>";
+    echo "<div style=\"margin:20px; margin-left:45px; margin-bottom:5px; font-size:90%; \">With the below selected students, set <span id=\"listContainer\"></span></div>";
 
     
-    echo "<table id=\"studentsTable\" cellpadding='5' cellspacing='0' border='1'>";
+    echo "<table id=\"studentsTable\" style=\"margin:0; padding:0; \" cellpadding='5' cellspacing='0' border='1'>";
     echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";

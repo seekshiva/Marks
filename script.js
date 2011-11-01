@@ -17,7 +17,7 @@ function setHouseInfo() {
 	str += "<option value=\"" + teams[i].teamId + "\">" + teams[i].team + "</option>";
     }
     str += "</select>";
-    str += "<input type=\"button\" value=\"Go!\" onclick=\"editStudents();\"><br /><br />";
+    str += "<input type=\"button\" value=\"Go!\" onclick=\"editStudents();\">";
     document.getElementById("listContainer").innerHTML = str;
 }
 
@@ -46,19 +46,6 @@ function editStudents() {
     window.location = url;
     console.log("url: " + url);
 }
-
-function filter() {
-    fval = document.getElementById("filter").value;
-    rows = document.getElementById("studentsTable").getElementsByTagName("tr");
-    for(i=0;i<rows.length;++i) {
-	ch = rows[i].childNodes;
-	if(ch[ch.length-1].nodeName == "TD")
-	    if(ch[ch.length-1].innerHTML > fval) {
-		rows[i].parentNode.removeChild(rows[i]);
-	    }
-    }
-}
-
 
 $(document).ready(function() {
     $("#optionHead").click(function(e) {
