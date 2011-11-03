@@ -199,6 +199,7 @@ function editStudentMarks() {
 	}
 	foreach($_POST as $key=>$val)
 	if(is_int($key)) {
+	    if( $val > 100 ) $val = 0;
 	    if($str=="" || !strpos(".".$str,"{" . $key . "}")) {
 	        mysql_query("INSERT INTO `marks` (`student_id`, `exam_id`, `course_code`, `marks`) VALUES ('{$key}', '{$examId}', '{$subjectId}', '{$val}')");
 	    }
