@@ -37,13 +37,13 @@ if(isset($_GET['sid'])) {
    echo "</div></td></tr></table>";
    
    $subjArr = Array();
-   $res2 = mysql_query("SELECT `subjects`.`subject_id`,`coursecode`.`course_name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id` = '" . $row['class_id'] . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
+   $res2 = mysql_query("SELECT `coursecode`.`course_code`,`coursecode`.`course_name` FROM `subjects`,`coursecode` WHERE `subjects`.`class_id` = '" . $row['class_id'] . "' AND `subjects`.`course_id` = `coursecode`.`course_code`");
    while($row2 = mysql_fetch_assoc($res2))
    {
-       $subjArr[$row2['subject_id']] = $row2['course_name'];
+       $subjArr[$row2['course_code']] = $row2['course_name'];
    }
    
-   $query = "SELECT `marks`.`student_id`,`marks`.`exam_id`,`exams`.`exam_name`,`marks`.`subject_id`,`marks`.`marks` FROM `marks`,`exams` WHERE `marks`.`exam_id` = `exams`.`exam_id` AND `marks`.`student_id` = '" . $row['student_id'] . "' ORDER BY `marks`.`exam_id` ASC";
+   $query = "SELECT `marks`.`student_id`,`marks`.`exam_id`,`exams`.`exam_name`,`marks`.`course_code`,`marks`.`marks` FROM `marks`,`exams` WHERE `marks`.`exam_id` = `exams`.`exam_id` AND `marks`.`student_id` = '" . $row['student_id'] . "' ORDER BY `marks`.`exam_id` ASC";
    $res = mysql_query($query);
    if(mysql_num_rows($res) == 0) die("The student has not written any exam yet!");
 
@@ -58,10 +58,10 @@ if(isset($_GET['sid'])) {
            displayMarks($marksArr , $subjArr);
 	   $marksArr["exam_id"]   = $row['exam_id'];
 	   $marksArr["exam_name"] = $row['exam_name'];
-	   $marksArr[$row['subject_id']]      = $row['marks'];
+	   $marksArr[$row['course_code']]      = $row['marks'];
        }
        else {
-	   $marksArr[$row['subject_id']] = $row['marks'];
+	   $marksArr[$row['course_code']] = $row['marks'];
        }
    }
    displayMarks($marksArr , $subjArr);

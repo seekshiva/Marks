@@ -11,3 +11,5 @@
 * attendance report - term-wise and total attendance
 * sort accoding to rank
 * highlight the particular mark entry in table if the student has failed or has got centum
+* graph between number of students and marks obtained
+* 
