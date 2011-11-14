@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>JKDSHKJ</title>
+<title>Some Random Title</title>
 <link rel="stylesheet" href="main.css">
 <script>
 var classId = <?php echo isset($_GET['class'])?$_GET['class']:0; ?>, 

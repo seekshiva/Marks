@@ -16,7 +16,7 @@ if(mysql_num_rows($res) == 0) {
     echo "No one has scored centum in any subject for this exam.<br />";
 }
 else {
-    echo "Centum Scorers from " . getClassName($classId) . " in " . getExamName($examId) . ":<ul>";
+    echo "Centum Scorers from " . getClassName($classId) . " in " . getExamName($examId) . ":<ul style=\"margin:2px; \">";
     while($row = mysql_fetch_assoc($res)) {
         echo "<li><b>" . $row['student_name'] ."</b> in " . $row['course_name'] . "</li>";
     }
@@ -33,7 +33,7 @@ if(mysql_num_rows($res) == 0) {
     echo "No one has scored scored in any subject for this exam.<br />";
 }
 else {
-    echo "Students who got matks below 40:<ul>";
+    echo "Students who got matks below 40:<ul style=\"margin:2px; \">";
     while($row = mysql_fetch_assoc($res)) {
         echo "<li><b>" . $row['student_name'] ."</b> in " . $row['course_name'] . "</li>";
     }
