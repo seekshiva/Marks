@@ -14,9 +14,7 @@ if(isset($_GET['teacher'])) {
 <link rel="stylesheet" href="main.css">
 </head>
 <body>
-<div id="menu">
-    <a href="./">Home</a><a href="./student.php">Students</a><a id="currentMenuItem" href="./teachers.php">Teachers</a>
-</div>
+<?php getMenu(3); ?>
 <div id="wrapper">
 <?php
 

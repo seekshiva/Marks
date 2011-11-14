@@ -1,3 +1,7 @@
+<?php
+include("connect.php");
+include("functions.lib.php");
+?>
 <!doctype html>
 <html>
 <head>
@@ -5,13 +9,9 @@
 <link rel="stylesheet" href="main.css">
 </head>
 <body>
-<div id="menu">
-    <a href="./">Home</a><a id="currentMenuItem" href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
-</div>
+<?php getMenu(2); ?>
 <div id="wrapper">
 <?php
-include("connect.php");
-include("functions.lib.php");
 
 if(isset($_GET['sid'])) {
    $query = "SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`students`.`house_id`,`classes`.`class_id`,`classes`.`class_name`,`teams`.`team_name`,`houses`.`house_name` FROM `students`,`classes`,`teams`,`houses` WHERE `students`.`student_id` = '" . $_GET['sid'] . "' AND `classes`.`class_id` = `students`.`class_id` AND `teams`.`team_id` = `students`.`team_id` AND `houses`.`house_id` = `students`.`house_id`";

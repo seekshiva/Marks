@@ -13,10 +13,7 @@ teams = [<?php echo getTeamsList(); ?>];
 <script src="script.js"></script>
 </head>
 <body>
-<div id="menu">
-    <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@example.com</span> <a href="#logout">Logout</a></div>
-    <a <?php if(count($_GET) == 0) echo "id=\"currentMenuItem\"";  ?>href="./">Home</a><a href="./student.php">Students</a><a href="./teachers.php">Teachers</a>
-</div>
+<?php getMenu(1); ?>
 <div id="wrapper">
 <?php
 if(isset($_GET['subject'])) {
@@ -59,12 +56,18 @@ else if(isset($_GET['house'])) {
     getStudentsFromHouse($_GET['house']);
 }
 else {
-    echo "<h3>Classes: <span class=\"s\">[<a href=\"./?addclass=1\">Add a new class to the list</a>]</span></h3>";
+    echo "<div align=\"center\"><h3 id=\"frameset\">";
+    echo "<span>Classes</span> ";
+    echo "<span>Houses</span> ";
+    echo "<span>Teams</span></h3></div>";
+    echo "<div class=\"blocklist\"><div id=\"frames\">";
+    echo "<div class=\"framevals\" id=\"frameval2\">";
     generateClassesList();
-    ?>
-
-<?php
+    echo "</div><div class=\"framevals\" id=\"frameval2\">";
     generateHousesList();
+    echo "</div><div class=\"framevals\" id=\"frameval3\">";
+    generateTeamsList();
+    echo "</div></div></div>";
 }
 ?>
 </div>

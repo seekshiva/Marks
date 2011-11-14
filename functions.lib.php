@@ -6,6 +6,19 @@ include("connect.php");
  */
 function init() {}
 
+function getMenu($num) {
+?>
+<div id="menu">
+    <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@example.com</span> <a href="#logout">Logout</a></div>
+    <a <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>href="./">Home</a>
+    <a <?php if($num == 2) echo "id=\"currentMenuItem\" "; ?>href="./student.php">Students</a>
+    <a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a>
+    <a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="#">Houses</a>
+    <a <?php if($num == 5) echo "id=\"currentMenuItem\" "; ?>href="#">Teams</a>
+</div>
+<?php
+}
+
 function getHousesList() {
     $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
     $str = "";
@@ -26,7 +39,8 @@ function getTeamsList() {
 
 function generateClassesList() {
     $res = mysql_query("SELECT * FROM `classes` WHERE 1 ORDER BY `class_id`");
-    echo "<div>";
+    echo "<span class=\"s\">[<a href=\"./?addclass=1\">Add a new class to the list</a>]</span>";
+    echo "<div style=\"text-align:left; margin-left:50px; padding-left:50px; \">";
     while($row = mysql_fetch_assoc($res)) {
         echo  "<div style=\"display:inline-block; padding:2px; width:80px; border:1px solid #964; background-color:#ecd\"><a href=\"./?class=" . $row['class_id']. "\">" . $row['class_name'] . "</a></div>";
     }
@@ -34,23 +48,17 @@ function generateClassesList() {
 }
 
 function generateTeamsList() {
-    echo "<h3>Teams:</h3>";
     $res = mysql_query("SELECT * FROM `teams` WHERE 1 ORDER BY `team_id`");
-    echo "<ul>";
     while($row = mysql_fetch_assoc($res)) {
-        echo  "<li><a href=\"./?team=" . $row['team_id']. "\">" . $row['team_name'] . "</a></li>";
+        echo  "<div class=\"blockli\"><a href=\"./?team=" . $row['team_id']. "\">" . $row['team_name'] . "</a></div>";
     }
-    echo "</ul>";
 }
 
 function generateHousesList() {
     $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
-    echo "<div class=\"blocklist\">";
-    echo "<h3>Houses:</h3>";
     while($row = mysql_fetch_assoc($res)) {
         echo  "<div class=\"blockli\"><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></div>";
     }
-    echo "</div>";
 }
 
 function addStudents() {
