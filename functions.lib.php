@@ -26,11 +26,11 @@ function getTeamsList() {
 
 function generateClassesList() {
     $res = mysql_query("SELECT * FROM `classes` WHERE 1 ORDER BY `class_id`");
-    echo "<ul>";
+    echo "<div>";
     while($row = mysql_fetch_assoc($res)) {
-        echo  "<li><a href=\"./?class=" . $row['class_id']. "\">" . $row['class_name'] . "</a></li>";
+        echo  "<div style=\"display:inline-block; padding:2px; width:80px; border:1px solid #964; background-color:#ecd\"><a href=\"./?class=" . $row['class_id']. "\">" . $row['class_name'] . "</a></div>";
     }
-    echo "</ul>";
+    echo "</div>";
 }
 
 function generateTeamsList() {
@@ -44,13 +44,13 @@ function generateTeamsList() {
 }
 
 function generateHousesList() {
-    echo "<h3>Houses:</h3>";
     $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
-    echo "<ul>";
+    echo "<div class=\"blocklist\">";
+    echo "<h3>Houses:</h3>";
     while($row = mysql_fetch_assoc($res)) {
-        echo  "<li><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></li>";
+        echo  "<div class=\"blockli\"><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></div>";
     }
-    echo "</ul>";
+    echo "</div>";
 }
 
 function addStudents() {
