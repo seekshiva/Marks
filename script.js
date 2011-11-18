@@ -47,36 +47,20 @@ function editStudents() {
     console.log("url: " + url);
 }
 
-function bindFrameEvent() {
-    return function(num) {
-	console.log(num);
-	$("#frames").fadeOut(700,function() {
-	    console.log(num);
-	    for(var i=0;i<3;++i) {
-		if(i!=num) {
-		    $("#frameval" + i).hide(0);
-		    console.log("hiding.." + i);
-		}
-		else {
-		    $("#frameval" + num + 1).show(0);
-		    console.log("showing.. "+i);
-		}
-	    }
-	    console.log("queue done!");
-	    $("#frames").fadeIn();
-	});
-    };
-}
-
 $(document).ready(function() {
     var f = $("#frameset span");
-    for(var i = 0; i < f.length; ++i) {
-	var mmmm = bindFrameEvent();
-	var m2 = mmmm;
-	$($("#frameset span")[i]).click(function() {
-	    m2(i);
-	});
-    }
+    $("#f1").click(function() {
+	$(".framevals").slideUp();
+	$("#frameval1").slideDown();
+    });
+    $("#f2").click(function() {
+	$(".framevals").slideUp();
+	$("#frameval2").slideDown();
+    });
+    $("#f3").click(function() {
+	$(".framevals").slideUp();
+	$("#frameval3").slideDown();
+    });
     $("#optionHead").click(function(e) {
 	$("#optionBody").slideToggle(0);
 	if(localStorage["optionDown"] == "1") {

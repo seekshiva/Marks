@@ -57,15 +57,15 @@ else if(isset($_GET['house'])) {
 }
 else {
     echo "<div align=\"center\"><h3 id=\"frameset\">";
-    echo "<span>Classes</span> ";
-    echo "<span>Houses</span> ";
-    echo "<span>Teams</span></h3></div>";
+    echo "<span id=\"f1\">Classes</span> ";
+    echo "<span id=\"f2\">Houses</span> ";
+    echo "<span id=\"f3\">Teams</span></h3></div>";
     echo "<div class=\"blocklist\"><div id=\"frames\">";
-    echo "<div class=\"framevals\" id=\"frameval2\">";
+    echo "<div class=\"framevals\" id=\"frameval1\" style=\"display:none;\">";
     generateClassesList();
     echo "</div><div class=\"framevals\" id=\"frameval2\">";
     generateHousesList();
-    echo "</div><div class=\"framevals\" id=\"frameval3\">";
+    echo "</div><div class=\"framevals\" id=\"frameval3\" style=\"display:none;\">";
     generateTeamsList();
     echo "</div></div></div>";
 }
