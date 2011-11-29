@@ -9,7 +9,7 @@ function init() {}
 function getMenu($num) {
 ?>
 <div id="menu">
-    <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@example.com</span> <a href="#logout">Logout</a></div>
+    <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@sjnschool.com</span> <a href="#logout">Logout</a></div>
     <a <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>href="./">Home</a>
     <a <?php if($num == 2) echo "id=\"currentMenuItem\" "; ?>href="./student.php">Students</a>
     <a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a>
@@ -38,6 +38,19 @@ function getTeamsList() {
     $count = 1;
     while($row = mysql_fetch_assoc($res)) {
         $str .= "\"" . $row['team_id']. "\": \"" . $row['team_name'] . "\", ";
+	$count = $count + 1;
+    }
+    $str .="\"length\":\"" . $count . "\"";
+    $str .= "}";
+    return $str;
+}
+
+function getTeachersList() {
+    $res = mysql_query("SELECT * FROM `teachers` WHERE 1 ORDER BY `teacher_id`");
+    $str = "{\"0\": {\"id\":\"0\", \"code\":\"\", \"name\":\"-\"}, \n";
+    $count = 1;
+    while($row = mysql_fetch_assoc($res)) {
+        $str .= "\"{$count}\": {\"id\": \"" . $row['teacher_id']. "\", \"code\":\"" . $row['teacher_code'] . "\", \"name\":\"" . $row['teacher_name'] . "\"}, \n";
 	$count = $count + 1;
     }
     $str .="\"length\":\"" . $count . "\"";
@@ -78,7 +91,7 @@ function addStudents() {
 	$query = "INSERT INTO `students` (`adm_no`, `exam_no`, `student_name`, `class_id`) VALUES ";
 	for($i=0;$i<count($studentNo);$i=$i+1) {
 	    if($i != 0) $query .= ", ";
-	    $query .= "('" . $admNo[$i] . "', '" . $examNo[$i] . "', '" . $studentNo[$i] . "','" . $_GET['class'] . "')";
+	    $query .= "('" . trim($admNo[$i]) . "', '" . trim($examNo[$i]) . "', '" . trim($studentNo[$i]) . "','" . $_GET['class'] . "')";
 	}
 	$query .= ";";
 	mysql_query($query);
@@ -103,10 +116,15 @@ function editStudentInfo() {
     $uid = explode(",",$_GET['uids']);
     error_log(print_r($_GET,1));
     for($i=0;$i<count($uid);$i=$i+1) {
-        if(isset($_GET['team']) && $_GET['team'] != 0) {
-	    $query = mysql_query("UPDATE  `students` SET  `team_id` =  '" . $_GET['team'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
-	}
-	if(isset($_GET['house']) && $_GET['house'])$query = mysql_query("UPDATE  `students` SET  `house_id` =  '" . $_GET['house'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+        if(isset($_GET['mentor']) && $_GET['mentor'] != 0)
+	$query = mysql_query("UPDATE  `students` SET  `mentor_id` =  '" . $_GET['mentor'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+
+        if(isset($_GET['team']) && $_GET['team'] != 0)
+	$query = mysql_query("UPDATE  `students` SET  `team_id` =  '" . $_GET['team'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+
+	if(isset($_GET['house']) && $_GET['house'])
+	$query = mysql_query("UPDATE  `students` SET  `house_id` =  '" . $_GET['house'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+
 	//echo $query."<br>";
     	//$res = mysql_query($query);
     }
@@ -114,7 +132,7 @@ function editStudentInfo() {
 
 function addClass() {
     if(isset($_POST['class'])) {
-        $query = "INSERT INTO `classes` (`class_id`, `class_name`, `curriculum`, `cteacher_id`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['curriculum'] . "', '" . $_POST['cteacher'] . "');";
+        $query = "INSERT INTO `classes` (`class_id`, `class`, `class_name`, `curriculum`, `cteacher_id`) VALUES (NULL, '" . $_POST['class'] . "', '" . $_POST['class_name'] . "', '" . $_POST['curriculum'] . "', '" . $_POST['cteacher'] . "');";
         mysql_query($query);
 	header("Location: ./");
     }
@@ -123,11 +141,18 @@ function addClass() {
     <h3>Add a new Class to the database</h3>
     <form action="" method="POST">
     	 <table>
-	     <tr><td><label>Enter Name of class<span class="s"> [like <b>XII-A(CS)</b> or <b>IX-B</b>]</span></label></td><td><input type="text" name="class" /></td></tr>
+	     <tr><td><label>Class</label></td><td><select name="class">
+	     <?php
+	     for($i = 4; $i <= 12; $i = $i + 1) {
+	         echo "<option value=\"{$i}\">{$i}</option>\n";
+	     }
+	     ?>
+	     </select></td></tr>
+	     <tr><td><label>Enter name of class<span class="s"> [like <b>XII-A(CS)</b> or <b>IX-B</b>]</span></label></td><td><input type="text" name="class_name" /></td></tr>
 	     <tr><td><label>Curriculum followed</label></td><td>
 	         <select name="curriculum">
-		     <option value="CBSE">CBSE</option>
 		     <option value="Samacheer">Samacheer</option>
+		     <option value="CBSE">CBSE</option>
 	         </select>
 	     </td></tr>
 	     <tr><td>Class Teacher</td><td><select name="cteacher">
@@ -253,7 +278,7 @@ function getStudentsFromClass($examId) {
     $classId = $_GET['class'];
     $subjectArray = Array();
 
-    echo "<div id=\"options\">";
+    echo "<div id=\"options\" class=\"np\">";
     echo "<div id=\"optionHead\">Options</div><br />";
     echo "<div style=\"display:none;\" id=\"optionBody\">";
 
@@ -271,7 +296,7 @@ function getStudentsFromClass($examId) {
 
     echo "</div></div>\n\n";
 
-    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><br /><span class=\"s\">Curriculum : " . getClassCurriculum($classId) . "<br />Class Teacher: " . getClassTeacherLink($classId) . "<br /></span></h3>";
+    echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><br /><span class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "<br /></span>Class Teacher: " . getClassTeacherLink($classId) . "<br /></span></h3>";
 
     
     /**
@@ -283,7 +308,7 @@ function getStudentsFromClass($examId) {
         echo "No subjects found!";
     }
     else {
-        echo "<table id=\"subjList\" border='1' cellspacing='0' cellpadding='3'><tr>";
+        echo "<table id=\"subjList\" class=\"np\" border='1' cellspacing='0' cellpadding='3'><tr>";
     	while($row = mysql_fetch_array($res)) {
             $subjectArray[$row['code']] = $row['name'];
             echo "<td>" . $row['name'] . " <a class=\"closeButton\" href=\"./?subject=del&courseId=" .  $row['code']  . "&classId=" . $classId . "\">x</a></td>"; 
@@ -304,7 +329,7 @@ function getStudentsFromClass($examId) {
      *	The part where the list of exams is listed
     **/
     
-    echo "<div class=\"block\">";
+    echo "<div class=\"block np\">";
     $res2 = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
     if(mysql_num_rows($res2) == 0) {
         echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
@@ -327,11 +352,11 @@ function getStudentsFromClass($examId) {
     }
     
     echo "</div>";
-    echo "<div style=\"margin:20px; margin-left:45px; margin-bottom:5px; font-size:90%; \">With the below selected students, set <span id=\"listContainer\"></span></div>";
+    echo "<div class=\"np\" style=\"margin:20px; margin-left:45px; margin-bottom:5px; font-size:90%; \">With the below selected students, set <span id=\"listContainer\"></span></div>";
 
     
     echo "<table id=\"studentsTable\" style=\"margin:0; padding:0; \" cellpadding='5' cellspacing='0' border='1'>";
-    echo "<tr><th></th><th>Exam No</th><th>Admission<br>Number</th><th>Name</th>";
+    echo "<tr><th><span class=\"op\">S.No</span></th><th>Exm No</th><th>Adm No</th><th>Name</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
 	echo "<th>Total</th><th>Average</th><th>Pass/Fail Status</th>";
@@ -339,7 +364,9 @@ function getStudentsFromClass($examId) {
     else echo "<th>Mentor</th><th>House</th><th>Team</th>";
     echo "</tr>\n";
 
+    $countvar = 0;
     while($row = mysql_fetch_assoc($res)) {
+        $countvar = $countvar + 1;
         $subjArr = Array();
         $query2 = "SELECT `course_code`,`marks` FROM `marks` WHERE `student_id` = '" . $row['student_id'] . "' AND `exam_id` = '" . $examId . "' ";
 	$res2 = mysql_query($query2);
@@ -347,9 +374,9 @@ function getStudentsFromClass($examId) {
 	{
 	    $subjArr[$row2['course_code']] = $row2['marks'];
 	}
-        echo "<tr><td onclick=\"this.childNodes[0].checked = !this.childNodes[0].checked; \" style=\"cursor:pointer; \"><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td>";
+        echo "<tr><td onclick=\"this.childNodes[1].checked = !this.childNodes[1].checked; \" style=\"cursor:pointer; \"><span class=\"op\">{$countvar}</span><input class=\"np\" type=\"checkbox\" name=\"uids[]\" value=\"" . $row['student_id'] . "\" /></td><td>" . $row['exam_no'] . "</td><td>" . $row['adm_no'] . "</td><td><nobr><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></nobr></td>";
 	if($examId == 0) {
-	    echo "<td>" . getMentorName($row["student_id"]) . "</td><td>" . getHouseName($row['house_id']) . "</td><td>" . getTeamName($row['team_id']) . "</td>";
+	    echo "<td>" . getMentorName($row["student_id"]) . "</td><td><a href=\"./?house=" . $row['house_id'] . "\">" . getHouseName($row['house_id']) . "</a></td><td>" . getTeamName($row['team_id']) . "</td>";
 	}
 	else {
 	    $count = 0;
@@ -358,7 +385,7 @@ function getStudentsFromClass($examId) {
 	    foreach($subjectArray as $key=>$val ) {
 	        echo "<td";
 	    	if(isset($subjArr[$key])) {
-		    if($subjArr[$key] < 35) echo " style=\"background-color:#a00; color:#fff; \"";
+		    if($subjArr[$key] < 35) echo " class=\"red\"";
 	            echo ">" . $subjArr[$key];
 		    if($subjArr[$key] < 35 ) $fail = 1;
 		    $count = $count + 1;
