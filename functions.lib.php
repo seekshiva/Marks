@@ -244,6 +244,7 @@ function editStudentMarks() {
 	foreach($_POST as $key=>$val)
 	if(is_int($key)) {
 	    if( $val > 100 ) $val = 0;
+	    if($val == "ab") $val = -1;
 	    if($str=="" || !strpos(".".$str,"{" . $key . "}")) {
 	        mysql_query("INSERT INTO `marks` (`student_id`, `exam_id`, `course_code`, `marks`) VALUES ('{$key}', '{$examId}', '{$subjectId}', '{$val}')");
 	    }
@@ -359,7 +360,7 @@ function getStudentsFromClass($examId) {
     echo "<tr><th><span class=\"op\">S.No</span></th><th>Exm No</th><th>Adm No</th><th>Name</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
-	echo "<th>Total</th><th>Average</th><th>Pass/Fail Status</th>";
+	echo "<th>Total</th><th>Avg</th><th>Pass/Fail Status</th>";
     }
     else echo "<th>Mentor</th><th>House</th><th>Team</th>";
     echo "</tr>\n";
@@ -385,11 +386,17 @@ function getStudentsFromClass($examId) {
 	    foreach($subjectArray as $key=>$val ) {
 	        echo "<td";
 	    	if(isset($subjArr[$key])) {
-		    if($subjArr[$key] < 35) echo " class=\"red\"";
-	            echo ">" . $subjArr[$key];
-		    if($subjArr[$key] < 35 ) $fail = 1;
-		    $count = $count + 1;
-		    $sum = $sum + $subjArr[$key];
+		    $marks = $subjArr[$key];
+		    if($marks == -1) $marks = "ab";
+		    if($subjArr[$key] < 35 && $subjArr[$key] >= 0) echo " class=\"red\"";
+		    else if($subjArr[$key] == -1) echo " class=\"red-absent\"";
+	            echo ">" . $marks;
+		    if($subjArr[$key] < 35 && $subjArr[$key] >= 0) $fail = 1;
+		    
+		    if($subjArr[$key] != -1) {
+		        $count = $count + 1;
+		        $sum = $sum + $subjArr[$key];
+		    }
 	    	}
 	    	else {
 	            echo ">not available<br />";
@@ -399,6 +406,7 @@ function getStudentsFromClass($examId) {
 	    $avg = ($count) ? $sum/$count : 0;
 	    $avg = substr($avg,0,strpos($avg,".") + 3);
 	    echo "<td>" . $sum . "</td><td>" . $avg . "</td><td>";
+	    if($avg < 50) $fail = 1;
 	    if($fail) echo "FAIL"; else echo "PASS";
 	    echo "</td>";
 	}
