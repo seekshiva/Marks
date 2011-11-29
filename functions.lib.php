@@ -13,7 +13,7 @@ function getMenu($num) {
     <a <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>href="./">Home</a>
     <a <?php if($num == 2) echo "id=\"currentMenuItem\" "; ?>href="./student.php">Students</a>
     <a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a>
-    <a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="#">Houses</a>
+    <a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="./?house=\">Houses</a>
     <a <?php if($num == 5) echo "id=\"currentMenuItem\" "; ?>href="#">Teams</a>
 </div>
 <?php
@@ -21,19 +21,27 @@ function getMenu($num) {
 
 function getHousesList() {
     $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
-    $str = "";
+    $str = "{\"0\":\"-\", ";
+    $count = 1;
     while($row = mysql_fetch_assoc($res)) {
-        $str .= "{houseId: \"" . $row['house_id']. "\", house: \"" . $row['house_name'] . "\" }, ";
+        $str .= "\"" . $row['house_id']. "\": \"" . $row['house_name'] . "\" , ";
+	$count = $count + 1;
     }
+    $str .="\"length\":\"" . $count . "\"";
+    $str .= "}";
     return $str;
 }
 
 function getTeamsList() {
     $res = mysql_query("SELECT * FROM `teams` WHERE 1 ORDER BY `team_id`");
-    $str = "";
+    $str = "{\"0\":\"-\", ";
+    $count = 1;
     while($row = mysql_fetch_assoc($res)) {
-        $str .= "{teamId: \"" . $row['team_id']. "\", team: \"" . $row['team_name'] . "\" }, ";
+        $str .= "\"" . $row['team_id']. "\": \"" . $row['team_name'] . "\", ";
+	$count = $count + 1;
     }
+    $str .="\"length\":\"" . $count . "\"";
+    $str .= "}";
     return $str;
 }
 
@@ -93,8 +101,11 @@ function addStudents() {
 
 function editStudentInfo() {
     $uid = explode(",",$_GET['uids']);
+    error_log(print_r($_GET,1));
     for($i=0;$i<count($uid);$i=$i+1) {
-        if(isset($_GET['team']) && $_GET['team'] != 0) $query = mysql_query("UPDATE  `students` SET  `team_id` =  '" . $_GET['team'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+        if(isset($_GET['team']) && $_GET['team'] != 0) {
+	    $query = mysql_query("UPDATE  `students` SET  `team_id` =  '" . $_GET['team'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
+	}
 	if(isset($_GET['house']) && $_GET['house'])$query = mysql_query("UPDATE  `students` SET  `house_id` =  '" . $_GET['house'] . "' WHERE  `student_id` =" . $uid[$i] . ";");
 	//echo $query."<br>";
     	//$res = mysql_query($query);

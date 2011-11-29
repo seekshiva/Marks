@@ -6,15 +6,15 @@ function setHouseInfo() {
     str += "<input type=\"hidden\" name=\"uids\" value=\"" + x + "\">";
     str += "<label for=\"houseList\">House</label>: <select id=\"houseList\" name=\"houseList\">";
     str += "<option value=\"0\">-</option>";
-    for(var i=0;i<houses.length;++i) {
-	str += "<option value=\"" + houses[i].houseId + "\">" + houses[i].house + "</option>";
+    for(var i=1;i<houses.length;++i) {
+	str += "<option value=\"" + i + "\">" + houses[i] + "</option>";
     }
     str += "</select> ";
 
     str += "<label for=\"teamList\">Team</label>: <select id=\"teamList\" name=\"teamList\">";
     str += "<option value=\"0\">-</option>";
-    for(var i=0;i<teams.length;++i) {
-	str += "<option value=\"" + teams[i].teamId + "\">" + teams[i].team + "</option>";
+    for(var i=1;i<teams.length;++i) {
+	str += "<option value=\"" + i + "\">" + teams[i] + "</option>";
     }
     str += "</select>";
     str += "<input type=\"button\" value=\"Go!\" onclick=\"editStudents();\">";
@@ -46,6 +46,27 @@ function editStudents() {
     window.location = url;
     console.log("url: " + url);
 }
+
+function getStudentsFromClass() {
+    setHouseInfo();
+    var str = "<tr><th></th><th>Exam No</th><th>Admission Number</th><th>Name</th><th>Team</th><th>House</th></tr>\n",
+    t = document.createElement("table");
+    t.setAttribute("id","studentsTable");
+    t.setAttribute("border","1");
+    t.setAttribute("cellpadding","10");
+    t.setAttribute("cellspacing","0");
+    for(var i=1; i < studentsList.length; ++i) {
+	str += "<tr><td><a></a><input type=\"checkbox\" name=\"uids[]\" value=\"" + studentsList[i].sid + "\"></td>";
+	str += "<td>" + studentsList[i].exam_no + "</td>";
+	str += "<td>" + studentsList[i].adm_no + "</td>";
+	str += "<td><a href=\"./student.php?sid=" + studentsList[i].sid + "\">" + studentsList[i].name + "</td>";
+	str += "<td>" + teams[studentsList[i].team] + "</td>";
+	str += "<td>" + houses[studentsList[i].house] + "</td></tr>\n";
+    }
+    t.innerHTML = str;
+    $("#marks-div").html(t);
+}
+
 
 $(document).ready(function() {
     var f = $("#frameset span");

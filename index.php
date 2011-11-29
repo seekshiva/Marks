@@ -6,8 +6,9 @@
 <link rel="stylesheet" href="main.css">
 <script>
 var classId = <?php echo isset($_GET['class'])?$_GET['class']:0; ?>, 
-houses = [<?php echo getHousesList(); ?>],
-teams = [<?php echo getTeamsList(); ?>];
+houses = <?php echo getHousesList(); ?>,
+teams = <?php echo getTeamsList(); ?>,
+studentsList;
 </script>
 <script src="jquery.js"></script>
 <script src="script.js"></script>
@@ -47,7 +48,27 @@ else if(isset($_GET['class']) && isset($_GET['exam'])) {
     else getStudentsFromClass($_GET['exam']);
 }
 else if(isset($_GET['class'])) {
+if(1) {
     getStudentsFromClass("");
+}
+else
+{$str =<<<abc
+    <div style="margin:20px; margin-left:10px; margin-bottom:5px; font-size:90%; "><span id="listContainer"></span></div>
+    <div id="marks-div"></div>
+    <script>
+        $(document).ready(function() {
+
+	    $.getJSON("./ajax.php?class={$_GET['class']}",function(data) {
+	        studentsList = data;
+		getStudentsFromClass();
+	    });
+	});
+    </script>
+abc;
+
+
+echo $str;
+}
 }
 else if(isset($_GET['team'])) {
     getStudentsFromTeam($_GET['team']);
