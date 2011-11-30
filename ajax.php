@@ -105,7 +105,8 @@ foreach($stuArr as $key=>$val) {
 
 str;
 for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1) {
-$marks = $stuArr[$key][$subjectArr["code"][$i]];
+if(isset($stuArr[$key][$subjectArr["code"][$i]])) $marks = $stuArr[$key][$subjectArr["code"][$i]];
+else $marks = "";
 if($marks == -1) $marks = "ab";
 $comma = ",";//(count($subjectArr["code"])- 1 != $i)?",":"";
 $str.=<<<str
