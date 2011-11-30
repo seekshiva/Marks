@@ -73,7 +73,9 @@ $classId = $_GET['class'];
     }
     echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
     echo "</form><hr />";
-    echo "<form class=\"s\" action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /><input type=\"submit\" value=\"Add\"></form>";
+    echo "<form class=\"s\" action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /> Max Marks\n";
+    echo "<select name=\"maxMarks\">\n<option value=\"50\">50</option>\n<option value=\"100\">100</option>\n<option value=\"200\">200</option></select>\n";
+    echo "<input type=\"submit\" value=\"Add\"></form>";
 
     echo "</div></div>\n\n";
 

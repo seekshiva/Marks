@@ -100,6 +100,7 @@ function generateStudentMapping() {
 function sortByExamNo() {
 	var t = document.createElement("table");
 	var str = "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
+	$("#examName").html(" - " + marks.exam_name + "(" + marks.exam_max_marks + ")");
 	for(var i=0;i<subjects.length; ++i) {
 	    str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
 	}
@@ -107,7 +108,7 @@ function sortByExamNo() {
 	t.setAttribute("id","studentsTable");
 	t.setAttribute("border","1");
 	t.setAttribute("cellpadding","0");
-	t.setAttribute("cellspacing","0");console.log(studentsList);
+	t.setAttribute("cellspacing","0");//console.log(studentsList);
 	for(var i=1; i < studentsList.length; ++i) {
 	    str += "<tr><td>" + i + "</td>";
 	    str += "<td>" + studentsList[i].exam_no + "</td>";
@@ -116,26 +117,40 @@ function sortByExamNo() {
 	    
 	    var sum = 0, count = 0;
 	    for(var j=0;j<subjects.length; ++j) {
-		currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
-		if(marks[studentsList[i].sid][subjects[j]["code"]] != "ab") {
-		    sum += currmark;
-		    ++count;
+		var currmark = 0,flag = false;
+		if(typeof(marks[studentsList[i].sid]) != "undefined") {
+		    if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") {
+			currmark = "ab";
+		    }
+		    else if(marks[studentsList[i].sid][subjects[j]["code"]] != "") {
+			currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
+			flag = true;
+		    }
+		    //console.log(marks[studentsList[i].sid][subjects[j]["code"]]);
 		}
+		if(typeof(marks[studentsList[i].sid]) != "undefined")
+		    if(flag) {
+			sum += currmark;
+			++count;
+		    }
 		//console.log(studentsList[i].sid + " - " + subjects[j]["code"]);
 		str += "<td";
-		if(currmark < 40) str += " class=\"red\"";
-		if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") str += " class=\"red-absent\"";
-		str += ">" + marks[studentsList[i].sid][subjects[j]["code"]] + "</td>";
+		if(currmark < 40 && flag) str += " class=\"red\"";
+		if(currmark == "ab") str += " class=\"red-absent\"";
+		str += ">" + currmark + "</td>";
 	    }
 	    str += "<td>" + sum + "</td><td";
-	    if(sum/count < 50) str += " class=\"red\"";
-	    str += ">" + sum/count + "</td>";
-	    str += "<td>" + marks[studentsList[i].sid].rank + "</td>";
+	    if(count == 0) avg = 0;
+	    else avg = sum/count;
+	    if(avg < 50 && avg > 0) str += " class=\"red\"";
+	    str += ">" + avg + "</td>";
+	    if(typeof(marks[studentsList[i].sid]) == "undefined") rank = "-";
+	    else rank = marks[studentsList[i].sid].rank;
+	    str += "<td>" + rank + "</td>";
 
 	}
 	t.innerHTML = str;
 	$("#marks-div").html(t);
-	$("#examName").html(" - " + marks.exam_name);    
 }
 
 function sortByRank() {
@@ -159,20 +174,34 @@ function sortByRank() {
 	
 	var sum = 0, count = 0;
 	for(var j=0;j<subjects.length; ++j) {
-	    currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
-	    if(marks[studentsList[i].sid][subjects[j]["code"]] != "ab") {
+	    var currmark = 0,flag = false;
+	    console.log(marks[studentsList[i].sid]);
+	    if(typeof(marks[studentsList[i].sid]) != "undefined") {
+		if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") {
+		    console.log("ab");
+		    currmark = "ab";
+		}
+		else if(marks[studentsList[i].sid][subjects[j]["code"]] != "") {
+		    currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
+		    flag = true;
+		}
+		//console.log(marks[studentsList[i].sid][subjects[j]["code"]]);
+	    }
+	    //currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
+	    if(flag) {
 		sum += currmark;
 		++count;
 	    }
-	    //console.log(studentsList[i].sid + " - " + subjects[j]["code"]);
 	    str += "<td";
-	    if(currmark < 40) str += " class=\"red\"";
+	    if(currmark < 40 && flag) str += " class=\"red\"";
 	    if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") str += " class=\"red-absent\"";
-	    str += ">" + marks[studentsList[i].sid][subjects[j]["code"]] + "</td>";
+	    str += ">" + currmark + "</td>";
 	}
 	str += "<td>" + sum + "</td><td";
-	if(sum/count < 50) str += " class=\"red\"";
-	str += ">" + sum/count + "</td>";
+	if(count == 0) avg = 0;
+	else avg = sum/count;
+	if(avg < 50 && avg > 0) str += " class=\"red\"";
+	str += ">" + avg + "</td>";
 	str += "<td>" + marks[studentsList[i].sid].rank + "</td>";
 	
     }

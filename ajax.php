@@ -90,9 +90,11 @@ $stuArr[$row['student_id']][$row['course_code']] = $row['marks'];
 }
 
 $ename = getExamName($examId);
+$emaxmarks = getExamMaxMarks($examId);
 $str =<<<str
 {
     "exam_name":"$ename",
+    "exam_max_marks":"$emaxmarks",
 
 str;
 

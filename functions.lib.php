@@ -178,7 +178,7 @@ function addSubject() {
 }
 
 function addExam() {
-    $query = "INSERT INTO `exams` (`class_id`,`exam_name`) VALUES ('" . $_GET['class'] . "','" . $_GET['examName'] . "')";
+    $query = "INSERT INTO `exams` (`class`,`exam_name`,`max_marks`) VALUES ('" . getClass($_GET['class']) . "','" . $_GET['examName'] . "', '" . $_GET['maxMarks'] . "')";//echo $query;die;
     mysql_query($query);
     header("Location: ./?class=" . $_GET['class']);
 }
@@ -211,6 +211,11 @@ function getClassName($classId) {
 function getExamName($examId) {
     $row = mysql_fetch_array(mysql_query("SELECT `exam_name` FROM `exams` WHERE `exam_id` = '" . $examId . "'"));
     return $row["exam_name"];
+}
+
+function getExamMaxmarks($examId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `max_marks` FROM `exams` WHERE `exam_id` = '" . $examId . "'"));
+    return $row["max_marks"];
 }
 
 function getSubjectName($subjectId) {

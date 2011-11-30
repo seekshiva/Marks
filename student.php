@@ -56,6 +56,7 @@ if(isset($_GET['sid'])) {
    while($row = mysql_fetch_assoc($res)) {
        if($marksArr["exam_id"] != $row['exam_id']) { //new row
            displayMarks($marksArr , $subjArr);
+	   $marksArr = Array();
 	   $marksArr["exam_id"]   = $row['exam_id'];
 	   $marksArr["exam_name"] = $row['exam_name'];
 	   $marksArr[$row['course_code']]      = $row['marks'];
