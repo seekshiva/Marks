@@ -3,7 +3,7 @@ include("connect.php");
 include("functions.lib.php");
 
 if(isset($_GET['teacher'])) {
-    mysql_query("INSERT INTO `teachers` (`teacher_name`) VALUES ('" . $_GET['teacher'] . "')");
+    mysql_query("INSERT INTO `teachers` (`teacher_code`,`teacher_name`) VALUES ('" . $_GET['t_code'] . "', '" . $_GET['teacher'] . "')");
     header("Location: ./teachers.php");
 }
 ?>
@@ -59,7 +59,7 @@ else {
     	echo "</ul>";
     }
     echo "<div class=\"block\">";
-    echo "<form action=\"\" method=\"GET\"><label class=\"s\" from=\"teacher\">Add New Teacher to the list: </label> <input type=\"text\" name=\"teacher\"> <input type=\"submit\" value=\"Go!\"></form>";
+    echo "<form action=\"\" method=\"GET\"><label class=\"s\" for=\"teacher\">Add New Teacher to the list: </label> <input type=\"text\" name=\"teacher\"> <label class=\"s\" for=\"t_code\">Code: </label> <input type=\"text\" name=\"t_code\" size=\"3\"> <input type=\"submit\" value=\"Go!\"></form>";
     echo "</div>";
 }
 ?>

@@ -1,6 +1,9 @@
 body {margin:0; }
 #menu,.np {display:none; }
 a {color:#000; text-decoration:none; }
-h3, h4 {margin:0; }
-td {font-size:small; }
+h3, h4 {margin:0; text-align:center; }
+h4 {font-weight:none; }
+table {margin:0; }
+td {font-size:8pt; }
 th, td {padding:3px; }
+.s {font-size:small; }

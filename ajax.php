@@ -1,7 +1,9 @@
 <?php
 header("Content-type: application/json");
 include("./functions.lib.php");
-$classId = isset($_GET['class'])?$_GET['class']:"1";
+$classId = isset($_GET['class'])?$_GET['class']:"0";
+
+if(!isset($_GET['exam'])) {
 $str = "{\n";
 
 $cname = getClassName($classId);
@@ -39,4 +41,114 @@ $str.=<<<str
 }
 str;
 echo $str;
+}
+
+else {
+$examId = $_GET['exam'];
+$rank = Array();
+$thisrank = Array();
+$subjectArr = Array();
+
+$str =<<<str
+SELECT `students`.`student_id`, `students`.`student_name`,SUM(`marks`.`marks`)/COUNT(`marks`.`marks`) AS `avg`
+FROM `students`,`marks`
+WHERE `marks`.`marks` != -1
+AND `students`.`student_id` = `marks`.`student_id`
+AND `marks`.`exam_id` = '{$_GET['exam']}'
+AND `students`.`student_id` IN (
+   SELECT `student_id` FROM `students` WHERE `class_id` IN (
+      SELECT `class_id` FROM `classes` WHERE `class`  = (
+         SELECT `class` FROM `classes` WHERE `classes`.`class_id` = '{$_GET['class']}'
+      )
+   )
+)
+GROUP BY `students`.`student_id` ORDER BY `avg` DESC;
+str;
+
+
+
+$res = mysql_query($str);
+$count = 1;
+while($row = mysql_fetch_assoc($res)) {
+$rank[$row['student_id']] = $count;
+$count = $count + 1;
+}
+
+$res = mysql_query("SELECT `course_id`,`course_name` FROM `subjects`,`coursecode` WHERE `class_id` = '{$classId}' AND `subjects`.`course_id` = `coursecode`.`course_code` ORDER BY `subject_id` ASC");
+$count = 0;
+while($row = mysql_fetch_assoc($res)) {
+   $subjectArr["code"][$count] = $row["course_id"];
+   $subjectArr["name"][$count] = $row["course_name"];
+   $count = $count + 1;
+}
+
+$stuArr = Array();
+
+$res = mysql_query("SELECT `student_id`,`course_code`,`marks` FROM `marks` WHERE `exam_id` = {$examId} AND `student_id` IN (SELECT `student_id` FROM `students` WHERE `class_id` = '{$classId}') ORDER BY `student_id` ASC");
+while($row = mysql_fetch_assoc($res)) {
+$stuArr[$row['student_id']][$row['course_code']] = $row['marks'];
+}
+
+$ename = getExamName($examId);
+$str =<<<str
+{
+    "exam_name":"$ename",
+
+str;
+
+$count = 1;
+foreach($stuArr as $key=>$val) {
+   $str .=<<<str
+    "{$key}": {
+
+str;
+for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1) {
+$marks = $stuArr[$key][$subjectArr["code"][$i]];
+if($marks == -1) $marks = "ab";
+$comma = ",";//(count($subjectArr["code"])- 1 != $i)?",":"";
+$str.=<<<str
+        "{$subjectArr["code"][$i]}": "{$marks}"{$comma}
+
+str;
+}
+$thisrank[$rank[$key]] = $key;
+$str.=<<<str
+        "rank": "{$rank[$key]}"
+    },
+
+str;
+   $count = $count + 1;
+}
+
+$str .=<<<str
+    "subjects" : 
+str;
+
+$str .= "[\n";
+for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1) {
+   $comma = (count($subjectArr["code"])- 1 != $i)?",":"";
+$str .=<<<str
+        {"code":"{$subjectArr["code"][$i]}", "name":"{$subjectArr["name"][$i]}"}{$comma}
+
+str;
+}
+$c = count($rank);
+$rl ="";
+for($i = 0; $i <= $c; $i = $i + 1)
+if(isset($thisrank[$i])) {
+   $rl .= $thisrank[$i] . ",";
+}
+$rl = substr($rl,0,strlen($rl) - 1);
+$str .=<<<str
+    ],
+    "class_total_strength":"$c",
+    "ranklist": [$rl]
+}
+
+str;
+
+
+
+echo $str;
+}
 ?>

@@ -1,4 +1,4 @@
-var tabl;
+var tabl,subjects,marks,classId,examId;
 function setHouseInfo() {
     var str="";
     var x="";
@@ -78,6 +78,110 @@ function getStudentsFromClass() {
 }
 
 
+function updateExamInfo(cid,eid) {
+    classId = cid;
+    examId = eid;
+    if(examId == 0) return;
+    $.getJSON("./ajax.php?class=" + classId + "&exam=" + examId, function(data) {
+	//console.log(data);
+	subjects = data.subjects; marks = data;
+	sortByExamNo();
+	$("#sorter").show();
+    });
+}
+
+function generateStudentMapping() {
+    for(var i = 1; i < studentsList.length; ++i) {
+	studentMapping[studentsList[i].sid] = i;
+    }
+    //console.log(studentMapping);
+}
+
+function sortByExamNo() {
+	var t = document.createElement("table");
+	var str = "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
+	for(var i=0;i<subjects.length; ++i) {
+	    str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
+	}
+	str += "<th>Total</th><th>Avg</th><th>Rank (" + marks.class_total_strength + ")</th></tr>\n";
+	t.setAttribute("id","studentsTable");
+	t.setAttribute("border","1");
+	t.setAttribute("cellpadding","0");
+	t.setAttribute("cellspacing","0");console.log(studentsList);
+	for(var i=1; i < studentsList.length; ++i) {
+	    str += "<tr><td>" + i + "</td>";
+	    str += "<td>" + studentsList[i].exam_no + "</td>";
+	    str += "<td>" + studentsList[i].adm_no + "</td>";
+	    str += "<td><a href=\"./student.php?sid=" + studentsList[i].sid + "\"><nobr>" + studentsList[i].name + "</nobr></td>";
+	    
+	    var sum = 0, count = 0;
+	    for(var j=0;j<subjects.length; ++j) {
+		currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
+		if(marks[studentsList[i].sid][subjects[j]["code"]] != "ab") {
+		    sum += currmark;
+		    ++count;
+		}
+		//console.log(studentsList[i].sid + " - " + subjects[j]["code"]);
+		str += "<td";
+		if(currmark < 40) str += " class=\"red\"";
+		if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") str += " class=\"red-absent\"";
+		str += ">" + marks[studentsList[i].sid][subjects[j]["code"]] + "</td>";
+	    }
+	    str += "<td>" + sum + "</td><td";
+	    if(sum/count < 50) str += " class=\"red\"";
+	    str += ">" + sum/count + "</td>";
+	    str += "<td>" + marks[studentsList[i].sid].rank + "</td>";
+
+	}
+	t.innerHTML = str;
+	$("#marks-div").html(t);
+	$("#examName").html(" - " + marks.exam_name);    
+}
+
+function sortByRank() {
+    var t = document.createElement("table");
+    var str = "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
+    for(var i=0;i<subjects.length; ++i) {
+	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
+    }
+    str += "<th>Total</th><th>Avg</th><th>Rank (" + marks.class_total_strength + ")</th></tr>\n";
+    t.setAttribute("id","studentsTable");
+    t.setAttribute("border","1");
+    t.setAttribute("cellpadding","0");
+    t.setAttribute("cellspacing","0");console.log(marks);
+    var index = 1;
+    for(var temp = 0; temp < marks.ranklist.length; ++temp, ++index) {
+	var i = studentMapping[marks.ranklist[temp]];
+	str += "<tr><td><span>" + index + "</span></td>";
+	str += "<td>" + studentsList[i].exam_no + "</td>";
+	str += "<td>" + studentsList[i].adm_no + "</td>";
+	str += "<td><a href=\"./student.php?sid=" + studentsList[i].sid + "\"><nobr>" + studentsList[i].name + "</nobr></td>";
+	
+	var sum = 0, count = 0;
+	for(var j=0;j<subjects.length; ++j) {
+	    currmark = parseInt(marks[studentsList[i].sid][subjects[j]["code"]]);
+	    if(marks[studentsList[i].sid][subjects[j]["code"]] != "ab") {
+		sum += currmark;
+		++count;
+	    }
+	    //console.log(studentsList[i].sid + " - " + subjects[j]["code"]);
+	    str += "<td";
+	    if(currmark < 40) str += " class=\"red\"";
+	    if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") str += " class=\"red-absent\"";
+	    str += ">" + marks[studentsList[i].sid][subjects[j]["code"]] + "</td>";
+	}
+	str += "<td>" + sum + "</td><td";
+	if(sum/count < 50) str += " class=\"red\"";
+	str += ">" + sum/count + "</td>";
+	str += "<td>" + marks[studentsList[i].sid].rank + "</td>";
+	
+    }
+    t.innerHTML = str;
+    $("#marks-div").html(t);
+    $("#examName").html(" - " + marks.exam_name);
+console.log("sorting by rank");    
+}
+
 $(document).ready(function() {
     var f = $("#frameset span");
     $("#f1").click(function() {
@@ -107,4 +211,6 @@ $(document).ready(function() {
 	    $("#optionBody").slideDown(0);
 	}
     }
+    $("#selectExam").val(0);
+    $("#sorter").hide();
 });

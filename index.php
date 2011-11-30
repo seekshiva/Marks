@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<title>Some Random Title</title>
+<title>Marks App by V. Shiva Nandan</title>
 <alink rel="stylesheet" href="main.css">
 <link rel="stylesheet" media="screen" href="main.css">
 <link rel="stylesheet" media="print" href="print.css">
@@ -11,7 +11,7 @@ var classId = <?php echo isset($_GET['class'])?$_GET['class']:0; ?>,
 houses = <?php echo getHousesList(); ?>,
 teams = <?php echo getTeamsList(); ?>,
 teachers = <?php echo getTeachersList(); ?>,
-studentsList;
+studentsList,studentMapping = {};
 </script>
 <script src="jquery.js"></script>
 <script src="script.js"></script>
@@ -58,7 +58,27 @@ else
 {
 
 $classId = $_GET['class'];
-echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a></h3>\n<h4 class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "</span></h4>\n<h4 class=\"s\">Class Teacher: " . getClassTeacherLink($classId) . "</h4><br />";
+
+    echo "<div id=\"options\" class=\"np\">";
+    echo "<div id=\"optionHead\">Options</div><br />";
+    echo "<div style=\"display:none;\" id=\"optionBody\">";
+
+    echo "<a class=\"s\" href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a><hr />";
+    $curriculum = getClassCurriculum($classId);
+    $res = mysql_query("SELECT `course_code`,`course_name` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
+    echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
+    echo "<option value=\"0\">-</option>";
+    while($row = mysql_fetch_assoc($res)) {
+        echo "<option value=\"" . $row['course_code'] . "\">" . $row['course_name'] . "</option>";
+    }
+    echo "</select><input type=\"hidden\" name=\"classId\" value=\"" . $classId . "\"> <input type=\"submit\" value=\"Go!\">";
+    echo "</form><hr />";
+    echo "<form class=\"s\" action=\"./?addExam\"><label for=\"examName\">Add a new exam for the class: </label><input type=\"hidden\" name=\"class\" value=\"" . $classId . "\"><input type=\"text\" name=\"examName\" /><input type=\"submit\" value=\"Add\"></form>";
+
+    echo "</div></div>\n\n";
+
+
+echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><span id=\"examName\"></span></h3>\n<h4 class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "</span></h4>\n<h4 class=\"s np\">Class Teacher: " . getClassTeacherLink($classId) . "</h4><br />";
 
     $examId = 0;
     /**
@@ -66,20 +86,20 @@ echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId)
     **/
     
     echo "<div class=\"block np\"><span class=\"s\">Select an Exam from the list: </span>";
-    $res2 = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
+    $res2 = mysql_query("SELECT * FROM `exams` WHERE `class` = '" . getClass($classId) . "';");
     if(mysql_num_rows($res2) == 0) {
         echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
     }
     else {
-    echo "<select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
-    echo "<option value=\"0\">--Select an Exam from below--</option>";
+    echo "\n<select id=\"selectExam\" onchange=\"updateExamInfo(" . $_GET['class'] . ", this.value);\">";
+    echo "\n<option value=\"0\" selected=\"selected\">--Select an Exam from below--</option>";
     while($row2 = mysql_fetch_assoc($res2)) {
     if($examId && $examId == $row2['exam_id'])
-        echo "<option selected=\"true\" value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+        echo "\n<option selected=\"true\" value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
     else
-        echo "<option value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+        echo "\n<option value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
     }
-    echo "</select>";
+    echo "\n</select>\n\n";
     }
     if($examId == 0) {
     }
@@ -91,20 +111,22 @@ echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId)
 
 $str =<<<abc
     <div class="np" style="margin-top:0; margin-left:10px; margin-bottom:5px; font-size:90%; "><span id="listContainer"></span></div>
+    <div class="np"><span id="sorter">Sort by: <a href="#" onclick="sortByExamNo(); return false;">Exam No.</a> <a href="#" onclick="sortByRank(); return false;">Rank</a></span></div>
     <div id="marks-div"></div>
     <script>
         $(document).ready(function() {
 
 	    $.getJSON("./ajax.php?class={$_GET['class']}",function(data) {
 	        studentsList = data;
+		generateStudentMapping();
 		getStudentsFromClass();
 	    });
 	});
     </script>
 abc;
 
-
 echo $str;
+include("signatures.php");
 }
 }
 else if(isset($_GET['team'])) {

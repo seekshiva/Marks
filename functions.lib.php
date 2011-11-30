@@ -185,12 +185,22 @@ function addExam() {
 
 function getTeamName($teamId) {
     $row = mysql_fetch_array(mysql_query("SELECT `team_name` FROM `teams` WHERE `team_id` = '" . $teamId . "'"));
-    return $row["team_name"];
+    return ($row["team_name"] == "")?"-":$row["team_name"];
 }
 
 function getHouseName($houseId) {
     $row = mysql_fetch_array(mysql_query("SELECT `house_name` FROM `houses` WHERE `house_id` = '" . $houseId . "'"));
-    return $row["house_name"];
+    return ($row["house_name"] == "")?"-":$row["house_name"];
+}
+
+function getClass($classId) {
+    $row = mysql_fetch_array(mysql_query("SELECT `class` FROM `classes` WHERE `class_id` = '" . $classId . "'"));
+    return $row["class"];
+}
+
+function getClassIdFromClass($class) {
+    $row = mysql_fetch_array(mysql_query("SELECT `class_id` FROM `classes` WHERE `class` = '" . $class . "'"));
+    return $row["class_id"];
 }
 
 function getClassName($classId) {
@@ -331,12 +341,12 @@ function getStudentsFromClass($examId) {
     **/
     
     echo "<div class=\"block np\">";
-    $res2 = mysql_query("SELECT * FROM `exams` WHERE `class_id` = '" . $classId . "';");
+    $res2 = mysql_query("SELECT * FROM `exams` WHERE `class` = '" . getClass($classId) . "';");
     if(mysql_num_rows($res2) == 0) {
         echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
     }
     else {
-    echo "<select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
+    echo "<span class=\"s\">Select an Exam from the list:</span><select id=\"selectExam\" onchange=\"window.location = './?class=" . $classId . "&exam=' + this.value\">";
     echo "<option value=\"0\">--Select an Exam from below--</option>";
     while($row2 = mysql_fetch_assoc($res2)) {
     if($examId && $examId == $row2['exam_id'])
@@ -360,7 +370,7 @@ function getStudentsFromClass($examId) {
     echo "<tr><th><span class=\"op\">S.No</span></th><th>Exm No</th><th>Adm No</th><th>Name</th>";
     if($examId != 0) {
         foreach($subjectArray as $key=>$val) echo "<th><a href=\"./?class={$classId}&exam={$examId}&editmarks=" . $key . "\">" . $val . "</a></th>";
-	echo "<th>Total</th><th>Avg</th><th>Pass/Fail Status</th>";
+	echo "<th>Total</th><th>Avg</th>";
     }
     else echo "<th>Mentor</th><th>House</th><th>Team</th>";
     echo "</tr>\n";
@@ -382,7 +392,6 @@ function getStudentsFromClass($examId) {
 	else {
 	    $count = 0;
 	    $sum   = 0;
-	    $fail  = 0;
 	    foreach($subjectArray as $key=>$val ) {
 	        echo "<td";
 	    	if(isset($subjArr[$key])) {
@@ -391,7 +400,6 @@ function getStudentsFromClass($examId) {
 		    if($subjArr[$key] < 35 && $subjArr[$key] >= 0) echo " class=\"red\"";
 		    else if($subjArr[$key] == -1) echo " class=\"red-absent\"";
 	            echo ">" . $marks;
-		    if($subjArr[$key] < 35 && $subjArr[$key] >= 0) $fail = 1;
 		    
 		    if($subjArr[$key] != -1) {
 		        $count = $count + 1;
@@ -405,10 +413,9 @@ function getStudentsFromClass($examId) {
 	    }
 	    $avg = ($count) ? $sum/$count : 0;
 	    $avg = substr($avg,0,strpos($avg,".") + 3);
-	    echo "<td>" . $sum . "</td><td>" . $avg . "</td><td>";
-	    if($avg < 50) $fail = 1;
-	    if($fail) echo "FAIL"; else echo "PASS";
-	    echo "</td>";
+	    echo "<td>" . $sum . "</td><td";
+	    if($avg < 50) echo " class=\"red\"";
+	    echo ">" . $avg . "</td>";
 	}
 	echo "</tr>";
     }

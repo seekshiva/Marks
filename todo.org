@@ -1,19 +1,16 @@
-* Update all possible list of subjects for CBSE and samacheer in the database
-* Enter list of teachers
-* Create all classes in the home page
-* For each class, select the list of courses being taught
-* Enter the list of students for each class
-
+* todo
+** Update all possible list of subjects for CBSE and samacheer in the database
+** Enter list of teachers
+** Create all classes in the home page
+** For each class, select the list of courses being taught
+** Enter the list of students for each class
 * student info is not available if no team or house info is available about the student
-
 * DONE mentor
 * subject wise centum list
 * attendance report - term-wise and total attendance
-* sort accoding to rank
+* DONE sort accoding to rank
 * DONE highlight the particular mark entry in table if the student has failed or has got centum
 * graph between number of students and marks obtained
-* 
-* rank column (for all sections)
+* DONE rank column (for all sections)
 * DONE aligning of class marklist
-* absentees shouldn't be 0
-
+* DONE absentees shouldn't be 0

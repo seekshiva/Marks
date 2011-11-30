@@ -14,7 +14,7 @@ include("functions.lib.php");
 <?php
 
 if(isset($_GET['sid'])) {
-   $query = "SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`students`.`house_id`,`classes`.`class_id`,`classes`.`class_name`,`teams`.`team_name`,`houses`.`house_name` FROM `students`,`classes`,`teams`,`houses` WHERE `students`.`student_id` = '" . $_GET['sid'] . "' AND `classes`.`class_id` = `students`.`class_id` AND `teams`.`team_id` = `students`.`team_id` AND `houses`.`house_id` = `students`.`house_id`";
+   $query = "SELECT `adm_no`,`student_id`,`student_name`,`house_id`,`class_id`,`team_id`,`house_id` FROM `students` WHERE `student_id` = '" . $_GET['sid'] . "'";
    //echo $query;
    $res = mysql_query($query);
    if(mysql_num_rows($res) == 0) die("Not a valid student id or the house and team info about the student has not been listed yet!");
@@ -30,10 +30,10 @@ if(isset($_GET['sid'])) {
    echo "<table cellpadding='10'><tr><td><img src=\"default.jpg\" height=\"70px\"></td><td>";
    echo "<h3 style=\"margin:0;\">" . $row['student_name'] . "</h3>";
    echo "<div style=\"font-size:70%; \">";
-   echo "is from class <b><a href=\"./?class=" . $row['class_id'] . "\">" . $row['class_name'] . "</a></b>.<br />";
+   echo "is from class <b><a href=\"./?class=" . $row['class_id'] . "\">" . getClassName($row['class_id']) . "</a></b>.<br />";
    echo $genderPrefix . " Class Teacher is <b>" . getClassTeacherLink($row['class_id']) . "</b> and " . $genderPrefix . " personal mentor is <b>" . getMentorName($row['student_id']) . "</b>.<br />";
    echo "Admission Number: <b>" . $row['adm_no'] . "</b><br />";
-   echo "<b>" . $row['house_name'] . "</b> House<br />Team <b>" . $row['team_name'] . "</b><br />";
+   echo "<b>" . gethouseName($row['house_id']) . "</b> House<br />Team <b>" . getTeamName($row['team_id']) . "</b><br />";
    echo "</div></td></tr></table>";
    
    $subjArr = Array();
