@@ -74,11 +74,12 @@ $rank[$row['student_id']] = $count;
 $count = $count + 1;
 }
 
-$res = mysql_query("SELECT `course_id`,`course_name` FROM `subjects`,`coursecode` WHERE `class_id` = '{$classId}' AND `subjects`.`course_id` = `coursecode`.`course_code` ORDER BY `subject_id` ASC");
+$res = mysql_query("SELECT `course_id`,`course_name`,`avg_req` FROM `subjects`,`coursecode` WHERE `class_id` = '{$classId}' AND `subjects`.`course_id` = `coursecode`.`course_code` ORDER BY `subject_id` ASC");
 $count = 0;
 while($row = mysql_fetch_assoc($res)) {
    $subjectArr["code"][$count] = $row["course_id"];
    $subjectArr["name"][$count] = $row["course_name"];
+   $subjectArr["avg"][$count] = $row["avg_req"];
    $count = $count + 1;
 }
 
@@ -124,17 +125,35 @@ str;
 }
 
 $str .=<<<str
-    "subjects" : 
+    "subjects" : [
+
 str;
 
-$str .= "[\n";
-for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1) {
-   $comma = (count($subjectArr["code"])- 1 != $i)?",":"";
+for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1)
+if($subjectArr["avg"][$i] == "1") {
+   $comma = (count($subjectArr["code"])- 1 != $i && $subjectArr["avg"][$i + 1] != "0")?",":"";
 $str .=<<<str
         {"code":"{$subjectArr["code"][$i]}", "name":"{$subjectArr["name"][$i]}"}{$comma}
 
 str;
 }
+
+
+$str .=<<<str
+    ],
+    "no_avg_subjects" : [
+
+str;
+
+for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1)
+if($subjectArr["avg"][$i] == "0") {
+   $comma = (count($subjectArr["code"])- 1 != $i && $subjectArr["avg"][$i] == "0")?",":"";
+$str .=<<<str
+        {"code":"{$subjectArr["code"][$i]}", "name":"{$subjectArr["name"][$i]}"}{$comma}
+
+str;
+}
+
 $c = count($rank);
 $rl ="";
 for($i = 0; $i <= $c; $i = $i + 1)
