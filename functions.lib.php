@@ -474,7 +474,7 @@ echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId)
 $str =<<<abc
     <div class="np" style="margin-top:0; margin-left:10px; margin-bottom:5px; font-size:90%; "><span id="listContainer"></span></div>
     <div id="tabbed" class="np">
-        <div>Marks</div> <div>Analysis</div>
+        <div onclick="sortByExamNo()">Marks</div> <div onclick="analyse();">Analysis</div>
     </div>
      <div id="marks-div"></div>
     <script>
