@@ -2,15 +2,17 @@
 
 h3,h4 {margin:0; }
 th, td {padding:10px; }
-.red {background-color:#a00; color:#fff; }
-.red-absent {background-color:#877; color:#fff; }
+.red {background-color:rgba(240,0,0,.7); color:#fff; }
+.red-absent {background-color:rgba(136,119,119,.8); color:#fff; }
 select .redc {color:#f00; background-color:auto; }
-#tabbed div {display:inline-block; background-color:#bacfad; padding:10px; border-radius:5px 15px 0 0; margin:0; cursor:pointer; }
+#tabbed div {display:inline-block; background-color:#bacfad; padding:10px; border-radius:5px 15px 0 0; margin:0; cursor:pointer; border:solid #bacfad; border-width:3px 4px 0 2px; font-weight:bold;  }
 #tabbed div:hover {background-color:#cadfbd; }
-#tabbed #hl {background-color:#cadfbd; }
-#marks-div {border:1px solid #111; padding:10px; background-color:#c9fbc8;}
-table {background-color:#fff; }
+#tabbed #hl {background-color:#c9fbc8; }
+#marks-div {border:1px solid #111; border-top:0; padding:10px; background-color:#c9fbc8;}
+table {background-color:rgba(255,255,255,.4); }
+th {background-color:rgba(255,255,255,.4); }
 .cb_selected {background-color:#c9c8fb; }
+#autosuggestStudents li {padding-bottom:10px; }
 
 body {font-size:1em; margin:0; }
 #wrapper {padding:5px; margin-top:40px;  }

@@ -297,12 +297,14 @@ function getStudentsFromHouse($houseId) {
         header("Location: ./");
     }
     if(isset($_POST['dummyvar'])) {
-        echo "<h3>" . getHouseName($_GET['house']) . " House</h3>";
         $res = mysql_query("SELECT `students`.`class_id`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`house_id` = '{$houseId}' AND `classes`.`class_id` = `students`.`class_id` GROUP BY `students`.`class_id`");
+	$flag = false;
 	while($row = mysql_fetch_assoc($res)) {
+	    if(!$flag)         echo "<h3>" . getHouseName($_GET['house']) . " House - " . getExamName($_POST['class' . $row['class_id']]) . "</h3>";
+	    $flag = true;
 	    if(! isset($_POST['class' . $row['class_id']])) continue;
             $subjArr = Array();		      
-            $query2 = "SELECT DISTINCT(`course_code`) FROM `marks` WHERE `exam_id` = '" . $_POST['class' . $row['class_id']] . "' ";
+            $query2 = "SELECT DISTINCT(`course_code`) FROM `marks` WHERE `exam_id` = '" . $_POST['class' . $row['class_id']] . "'";
 	    $res2 = mysql_query($query2);
             while($row2 = mysql_fetch_assoc($res2))
 	    {
@@ -310,21 +312,21 @@ function getStudentsFromHouse($houseId) {
 	    }
             $marksArr = Array();
 	    if(getExamName($_POST['class' . $row['class_id']]) == "") continue;
-	    echo "<h4>" . $row['class_name'] . " - " . getExamName($_POST['class' . $row['class_id']]) . "</h4>";
-	    //echo $_POST['class' . $row['class_id']];
+	    echo "<h4>" . getClassName($row['class_id']) . "</h4>";
 
 	    
 	    echo "<table border='1' cellspacing='0' cellpadding='3'>\n<tr><th>Admission<br>Number</th><th>Name</th>\n\n";
 	    foreach($subjArr as $key=>$val) echo "<th>" . getSubjectName($val) . "</th>";
 	    echo "<th>Total</th><th>Average</th></tr>\n\n";
 	    
-	    $query2 = "SELECT `students`.`student_id`, `students`.`adm_no`, `students`.`student_name`, `marks`.`course_code`, `marks`.`marks` FROM `students`,`marks` WHERE `marks`.`exam_id` = '" . $_POST['class' . $row['class_id']] . "' AND `students`.`house_id` = '{$houseId}' AND `students`.`student_id` = `marks`.`student_id` ORDER BY `students`.`student_id`";
+	    $query2 = "SELECT `students`.`student_id`, `students`.`adm_no`, `students`.`class_id`, `students`.`student_name`, `marks`.`course_code`, `marks`.`marks` FROM `students`,`marks` WHERE `marks`.`exam_id` = '" . $_POST['class' . $row['class_id']] . "' AND `students`.`class_id` = " . $row['class_id'] . " AND `students`.`house_id` = '{$houseId}' AND `students`.`student_id` = `marks`.`student_id` ORDER BY `students`.`student_id`";
 	    $res2 = mysql_query($query2);
 	    while($row2 = mysql_fetch_assoc($res2)) {
 	        $marksArr[$row2['student_id']]["adm_no"] = $row2['adm_no'];
 	        $marksArr[$row2['student_id']]["sid"] = $row2['student_id'];
 	        $marksArr[$row2['student_id']]["name"] = $row2['student_name'];
 	        $marksArr[$row2['student_id']]["subject" . $row2['course_code']] = $row2['marks'];
+	        $marksArr[$row2['student_id']]["class"] = getClassName($row2['class_id']);
 	    }
 	    foreach($marksArr as $key=>$val) {
 	        echo "<tr><td>" . $val["adm_no"] . "</td><td><a href=\"./student.php?sid=" . $val["sid"] . "\">" . $val["name"] . "</td>";
@@ -388,7 +390,7 @@ function getStudentsFromHouse($houseId) {
     $res = mysql_query("SELECT `students`.`adm_no`,`students`.`student_id`,`students`.`student_name`,`classes`.`class_name` FROM `students`,`classes` WHERE `students`.`house_id` = '{$houseId}' AND `classes`.`class_id` = `students`.`class_id` ORDER BY `students`.`class_id`");
     if(mysql_num_rows($res) ==0) return;
     echo "<h3>List of students in this house</h3>";
-    echo "<table border='1' cellspacing='0' cellpadding='4'><tr><th>Admission Number</th><th>Student Name</th><th>Class</th></tr>";
+    echo "<table border='1' cellspacing='0' cellpadding='4'><tr><th>Adm No</th><th>Student Name</th><th>Class</th></tr>";
     while($row = mysql_fetch_assoc($res)) {
         echo "<tr><td>" . $row['adm_no'] . "</td><td><a href=\"./student.php?sid=" . $row['student_id'] . "\">" . $row['student_name'] . "</a></td><td>" . $row['class_name'] . "</td></tr>";
     }
@@ -474,7 +476,7 @@ echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId)
 $str =<<<abc
     <div class="np" style="margin-top:0; margin-left:10px; margin-bottom:5px; font-size:90%; "><span id="listContainer"></span></div>
     <div id="tabbed" class="np">
-        <div onclick="sortByExamNo()">Marks</div> <div onclick="analyse();">Analysis</div>
+        <div onclick="sortByExamNo(); selectTab(0);">Marks</div> <div onclick="analyse(); selectTab(1);">Analysis</div>
     </div>
      <div id="marks-div"></div>
     <script>

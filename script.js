@@ -106,8 +106,7 @@ function sortByExamNo() {
     var t = document.createElement("table");
     var str = "<caption>" + sortString + "</caption>";
     str += "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
-    $($("#tabbed div")[0]).attr("id","hl");
-    $("#examName").html(" - " + marks.exam_name + "(" + marks.exam_max_marks + " marks)");
+    selectTab(0);
     for(var i=0;i<subjects.length; ++i) {
 	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
     }
@@ -148,9 +147,9 @@ function sortByExamNo() {
 	    str += "<td";
 	    if(currmark < 40 && flag) str += " class=\"red\"";
 	    if(currmark == "ab") str += " class=\"red-absent\"";
-	    str += ">" + currmark + "</td>";
+	    str += " style=\"text-align:center; \">" + currmark + "</td>";
 	}
-	str += "<td>" + sum + "</td><td";
+	str += "<td style=\"text-align:center; \">" + sum + "</td><td";
 	if(count == 0) avg = 0;
 	else avg = sum/count;
 	avg = avg * 100 / marks.exam_max_marks;
@@ -159,10 +158,10 @@ function sortByExamNo() {
 	    avg = avg.toString()
 	    avg = parseFloat(avg.substr(0,avg.indexOf(".") + 3));
 	}
-	str += ">" + avg + "</td>";
+	str += " style=\"text-align:center; \">" + avg + "</td>";
 	if(typeof(marks[studentsList[i].sid]) == "undefined") rank = "-";
 	else rank = marks[studentsList[i].sid].rank;
-	str += "<td>" + rank + "</td>";
+	str += "<td style=\"text-align:center; \">" + rank + "</td>";
 	for(var j=0;j<no_avg_subjects.length; ++j) {
 	    var currmark = 0,flag = false;
 	    if(typeof(marks[studentsList[i].sid]) != "undefined") {
@@ -178,12 +177,13 @@ function sortByExamNo() {
 	    str += "<td";
 	    if(currmark < 40 && flag) str += " class=\"red\"";
 	    if(currmark == "ab") str += " class=\"red-absent\"";
-	    str += ">" + currmark + "</td>";
+	    str += " style=\"text-align:center; \">" + currmark + "</td>";
 	}
 	str += "</tr>";
     }
     t.innerHTML = str;
     $("#marks-div").html(t);
+    $("#examName").html(" - " + marks.exam_name + " (" + marks.exam_max_marks + " marks)");
 }
 
 function sortByRank() {
@@ -233,9 +233,9 @@ function sortByRank() {
 	    str += "<td";
 	    if(currmark < 40 && flag) str += " class=\"red\"";
 	    if(marks[studentsList[i].sid][subjects[j]["code"]] == "ab") str += " class=\"red-absent\"";
-	    str += ">" + currmark + "</td>";
+	    str += " style=\"text-align:center; \">" + currmark + "</td>";
 	}
-	str += "<td>" + sum + "</td><td";
+	str += "<td style=\"text-align:center; \">" + sum + "</td><td";
 	if(count == 0) avg = 0;
 	else avg = sum/count;
 	if(avg < 50 && avg > 0) str += " class=\"red\"";
@@ -243,8 +243,8 @@ function sortByRank() {
 	    avg = avg.toString()
 	    avg = parseFloat(avg.substr(0,avg.indexOf(".") + 3));
 	}
-	str += ">" + avg + "</td>";
-	str += "<td>" + marks[studentsList[i].sid].rank + "</td>";
+	str += " style=\"text-align:center; \">" + avg + "</td>";
+	str += "<td style=\"text-align:center; \">" + marks[studentsList[i].sid].rank + "</td>";
 	
 	for(var j=0;j<no_avg_subjects.length; ++j) {
 	    var currmark = 0,flag = false;
@@ -261,17 +261,17 @@ function sortByRank() {
 	    str += "<td";
 	    if(currmark < 40 && flag) str += " class=\"red\"";
 	    if(currmark == "ab") str += " class=\"red-absent\"";
-	    str += ">" + currmark + "</td>";
+	    str += " style=\"text-align:center; \">" + currmark + "</td>";
 	}
 	str += "</tr>";
     }
     t.innerHTML = str;
     $("#marks-div").html(t);
-    $("#examName").html(" - " + marks.exam_name);
+    $("#examName").html(" - " + marks.exam_name + " (" + marks.exam_max_marks + " marks)");
 }
 
 function analyse() {
-    var range = Array(), str = "<table border=\"1\" cellspacing=\"0\"></tr><th>Subject</th>";
+    var range = Array(), str = "<table border=\"1\" cellspacing=\"0\"><tr><th>Subject</th>";
     for(var i=0;i<subjects.length; ++i) {
 	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
     }
@@ -279,6 +279,15 @@ function analyse() {
 	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + no_avg_subjects[i]["code"] + "\">" + no_avg_subjects[i]["name"] + "</a></th>";
     }
     str += "</tr>\n";
+    str += "<tr><th>Teacher</th>";
+    for(var i=0;i<subjects.length; ++i) {
+	str += "<td style=\"text-align:center; \" class=\"s\">N/A</td>";
+    }
+    for(var i=0;i<no_avg_subjects.length; ++i) {
+	str += "<td style=\"text-align:center; \" class=\"s\">N/A</td>";
+    }
+    str += "</tr>\n";
+
     for(var j = 0; j < subjects.length; ++j) {
 	range[subjects[j]["code"]] = Array();
 	range[subjects[j]["code"]]["ab"] = 0;
@@ -376,18 +385,23 @@ function analyse() {
 
     
     for(var i = 1; i < temp.length; ++i) {
-	str += "<tr><td>"+ temp2[temp[i]] + "</td>";
+	str += "<tr><th>"+ temp2[temp[i]] + "</th>";
 	for(var j = 0; j < subjects.length; ++j) {
-	    str += "<td>" + range[subjects[j]["code"]][temp[i]] + "</td>";
+	    str += "<td style=\"text-align:center; \">" + range[subjects[j]["code"]][temp[i]] + "</td>";
 	}
 	for(var j = 0; j < no_avg_subjects.length; ++j) {
-	    str += "<td>" + range[no_avg_subjects[j]["code"]][temp[i]] + "</td>";
+	    str += "<td style=\"text-align:center; \">" + range[no_avg_subjects[j]["code"]][temp[i]] + "</td>";
 	}
 	str += "</tr>\n";
     }
     console.log(range);
     str += "</table>";
     $("#marks-div").html(str);
+}
+
+function  selectTab(tabNo) {
+    $("#hl").attr("id","");
+    $($("#tabbed div")[tabNo]).attr("id","hl");    
 }
 
 $(document).ready(function() {

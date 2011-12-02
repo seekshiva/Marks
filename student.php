@@ -7,6 +7,7 @@ include("functions.lib.php");
 <head>
 <title>Student Information</title>
 <link rel="stylesheet" href="main.css">
+<script src="jquery.js"></script>
 </head>
 <body>
 <?php getMenu(2); ?>
@@ -70,11 +71,45 @@ if(isset($_GET['sid'])) {
    echo "</table>";
 }
 else {
-    echo "<h3>Student Information Retrieval System</h3>";
-    echo "<form action=\"\" method=\"GET\">Enter Student Id : <input type=\"text\" name=\"sid\" /> <input type=\"submit\" value=\"Go!\"></form><br>";
-    echo "Or select a student from the class list displayed below";
-    echo "<h3>Classes:</h3>";
-    generateClassesList();
+?>
+    Search for a student <input type="text" id="searchbox" style="padding:5px; font-size:13pt; " size="50" />
+    <div id="autosuggestStudents"></div>
+    <script>
+        var inter = 0;
+	$(document).ready(function() {
+	//console.log($("#searchbox"));
+	    $("#searchbox").focus();
+	    $("#searchbox").keyup(function() {
+	        if(inter) clearTimeout(inter);
+ 	        inter = setTimeout(getAS,300)
+	    });
+	});
+	function getAS() {
+	    if($("#searchbox").val() == "") {
+	        $("#autosuggestStudents").html("");
+	        return;
+	    }
+	    $("#autosuggestStudents").html("Loading...");
+	    $.getJSON("./autosuggest.php?searchq=" + encodeURI($("#searchbox").val()),function(data) {
+	        var str = "<h3 style=\"margin:0; margin-top:20px; padding:0;\">Search results for <i>" + $("#searchbox").val() + "</i></h3>";
+		if(data.length) {
+		str += "<ul>";
+	        for(var i=0;i<data.length; ++i) {
+		    str += "<li><div><b><a href=\"./student.php?sid=" + data[i].sid + "\">" + data[i].name + "</a></b></div>";
+		    str += "<div class=\"s\">from class " + data[i].class + ". Admission No.:<b>" + data[i].adm_no + "</b><br />";
+		    str += "House:" + data[i].house + ", Team " + data[i].team + "</div></li>";
+		}
+		str +="</ul>";
+		}
+		else {
+		    str += "<div style=\"margin:10px; \">No search results found!</div>";
+		}
+		$("#autosuggestStudents").html(str);
+	    });
+	}
+
+    </script>
+<?php
 }
 
 ?>

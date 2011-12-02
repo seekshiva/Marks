@@ -48,7 +48,7 @@ else if(isset($_GET['examName'])) {
 }
 else if(isset($_GET['class'])) {
     if(isset($_GET['editmarks'])) editStudentMarks();
-    else getStudentsFromClass($_GET['exam']);
+    else getStudentsFromClass(isset($_GET['exam'])?$_GET['exam']:"");
 }
 else if(isset($_GET['team'])) {
     getStudentsFromTeam($_GET['team']);
