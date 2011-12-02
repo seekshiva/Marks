@@ -444,41 +444,42 @@ function getStudentsFromClass() {
 
 echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><span id=\"examName\"></span></h3>\n<h4 class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "</span></h4>\n<h4 class=\"s np\">Class Teacher: " . getClassTeacherLink($classId) . "</h4><br />";
 
+
+$str =<<<abc
+    <table cellpadding="0" cellspacing="0" width="100%"><tr><td style="padding:0; vertical-align:bottom;">
+    <div id="tabbed" class="np">
+        <div onclick="getStudentsFromClass();">Class List</div> <a><div onclick="sortByExamNo();">Marks</div> <div onclick="analyse();">Analysis</div>
+    </div></td>
+    <td style="padding:0;"><div class="np" id="changer"><span id="listContainer"></span></div></td>
+abc;
+
+
     $examId = 0;
     /**
      *	The part where the list of exams is listed
     **/
     
-    echo "<div class=\"block np\"><span class=\"s\">Select an Exam from the list: </span>";
+    $str .= "<td style=\"padding:0;\"><div style=\"float:right; margin:0; \" class=\"block np\"><span class=\"s\">View Exam Marks: </span>";
     $res2 = mysql_query("SELECT * FROM `exams` WHERE `class` = '" . getClass($classId) . "';");
     if(mysql_num_rows($res2) == 0) {
-        echo "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
+        $str .= "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
     }
     else {
-    echo "\n<select id=\"selectExam\" onchange=\"updateExamInfo(" . $_GET['class'] . ", this.value);\">";
-    echo "\n<option value=\"0\" selected=\"selected\">--Select an Exam from below--</option>";
+    $str .= "\n<select id=\"selectExam\" onchange=\"updateExamInfo(" . $_GET['class'] . ", this.value);\">";
+    $str .= "\n<option value=\"0\" selected=\"selected\">--Select an Exam from below--</option>";
     while($row2 = mysql_fetch_assoc($res2)) {
     if($examId && $examId == $row2['exam_id'])
-        echo "\n<option selected=\"true\" value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+        $str .=  "\n<option selected=\"true\" value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
     else
-        echo "\n<option value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
+        $str .= "\n<option value=\"" . $row2['exam_id'] . "\">" . $row2['exam_name'] . "</option>";
     }
-    echo "\n</select>\n\n";
+    $str .= "\n</select>\n\n";
     }
-    if($examId == 0) {
-    }
-    else {
-        echo " <a href=\"./classanalysis.php?class=" . $_GET['class'] . "&exam=" . $_GET['exam'] . "\">See analysis of the exam</a>";
-    }
-    
-    echo "</div>";
+    $str .= "</div></td></tr></table>";
 
-$str =<<<abc
-    <div class="np" style="margin-top:0; margin-left:10px; margin-bottom:5px; font-size:90%; "><span id="listContainer"></span></div>
-    <div id="tabbed" class="np">
-        <div onclick="sortByExamNo(); selectTab(0);">Marks</div> <div onclick="analyse(); selectTab(1);">Analysis</div>
-    </div>
-     <div id="marks-div"></div>
+
+$str.=<<<abc
+    <div id="marks-div"></div>
     <script>
         $(document).ready(function() {
 
@@ -503,7 +504,7 @@ $str .=<<<abc
 	});
     </script>
 abc;
-echo $str;
+    echo $str;
 include("signatures.php");
 }
 ?>

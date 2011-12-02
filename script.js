@@ -58,7 +58,9 @@ function editStudents() {
 }
 
 function getStudentsFromClass() {
+    //window.location = "#!list";
     setHouseInfo();
+    selectTab(0);
     var str = "<tr><th><span class=\"op\">S.No</span></th><th>Adm No</th><th>Exm No</th><th>Name</th><th>Team</th><th>House</th><th>Mentor</th></tr>\n",
     t = document.createElement("table");
     t.setAttribute("id","studentsTable");
@@ -78,6 +80,7 @@ function getStudentsFromClass() {
     }
     t.innerHTML = str;
     $("#marks-div").html(t);
+    $("#examName").html("");
 }
 
 
@@ -103,10 +106,14 @@ function generateStudentMapping() {
 }
 
 function sortByExamNo() {
+    if(!marks) {
+	alert("Select an exam from the right corner to view the marks");
+	return;
+    }
     var t = document.createElement("table");
     var str = "<caption>" + sortString + "</caption>";
+    selectTab(1);
     str += "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
-    selectTab(0);
     for(var i=0;i<subjects.length; ++i) {
 	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
     }
@@ -187,6 +194,10 @@ function sortByExamNo() {
 }
 
 function sortByRank() {
+    if(!marks) {
+	alert("Select an exam from the right corner to view the marks");
+	return;
+    }
     var t = document.createElement("table");
     var str = "<caption>" + sortString + "</caption>";
     str += "<tr><th>S.No</th><th>Exm No</th><th>Adm No</th><th>Name</th>";
@@ -271,7 +282,12 @@ function sortByRank() {
 }
 
 function analyse() {
+    if(!marks) {
+	alert("Select an exam from the right corner to view the marks");
+	return;
+    }
     var range = Array(), str = "<table border=\"1\" cellspacing=\"0\"><tr><th>Subject</th>";
+    selectTab(2);
     for(var i=0;i<subjects.length; ++i) {
 	str += "<th style=\"width:40px; \"><a href=\"./?class=" + classId + "&exam=" + examId + "&editmarks=" + subjects[i]["code"] + "\">" + subjects[i]["name"] + "</a></th>";
     }
@@ -400,6 +416,9 @@ function analyse() {
 }
 
 function  selectTab(tabNo) {
+    $("#tabbed div").css({"display":"inline-block"});
+    if(tabNo == 0) $("#changer").show(0);
+    else  $("#changer").hide(0);
     $("#hl").attr("id","");
     $($("#tabbed div")[tabNo]).attr("id","hl");    
 }
