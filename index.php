@@ -1,4 +1,10 @@
-<?php include("functions.lib.php"); ?>
+<?php
+include("functions.lib.php");
+if(isset($_GET['class']) && !isset($_GET['editmarks']) && !isset($_GET['addstudents'])) {
+if(isset($_GET['exam'])) header("Location: ./#!class:" . $_GET['class'] . "|exam:" . $_GET['exam'] . "|list");
+else header("Location: ./#!class:" . $_GET['class']);
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -47,7 +53,10 @@ else if(isset($_GET['examName'])) {
     addExam();
 }
 else if(isset($_GET['class'])) {
-    if(isset($_GET['editmarks'])) editStudentMarks();
+    if(isset($_GET['editmarks'])) {
+        echo "<a href=\"?class=" . $_GET['class'] . "&exam=" . $_GET['exam'] . "\">Back</a><br /><br />";
+        editStudentMarks();
+    }
     else getStudentsFromClass(isset($_GET['exam'])?$_GET['exam']:"");
 }
 else if(isset($_GET['team'])) {

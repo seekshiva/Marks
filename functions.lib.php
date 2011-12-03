@@ -10,12 +10,44 @@ function getMenu($num) {
 ?>
 <div id="menu">
     <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@sjnschool.com</span> <a href="#logout">Logout</a></div>
-    <a <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>href="./">Home</a>
-    <a <?php if($num == 2) echo "id=\"currentMenuItem\" "; ?>href="./student.php">Students</a>
-    <a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a>
-    <a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="./?house=\">Houses</a>
-    <a <?php if($num == 5) echo "id=\"currentMenuItem\" "; ?>href="#">Teams</a>
+    <span <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>><a href="#">Class</a>
+    <div class="submenu">
+<?php generateClassesList(); ?>
+    </div>
+    </span>
+    <span><a <?php if($num == 2) echo "id=\"currentMenuItem\" "; ?>href="./student.php">Students</a></span>
+    <span><a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a></span>
+    <span><a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="./?house=0">Houses</a>
+    <div class="submenu">
+        <div>VIII-A</div>
+        <div>VIII-B</div>
+        <div>VIII-C</div>
+    </div>
+    </span>
+    <span><a <?php if($num == 5) echo "id=\"currentMenuItem\" "; ?>href="#">Teams</a></span>
 </div>
+<script>
+    var menuTimer = "";
+    $("#menu a").mouseover(function() {
+	timerMenu = $(this);
+	clearTimeout(menuTimer);
+	menuTimer = setTimeout(showmenu,200);
+    });
+    $("#menu a").mouseout(function() {
+	timerMenu = $(this);
+	clearTimeout(menuTimer);
+	menuTimer = setTimeout(hidemenu,300);
+    });
+
+function showmenu() {
+    $(timerMenu).parent().children(".submenu").slideDown("fast");
+}
+
+function hidemenu() {
+    $(".submenu").slideUp("fast");
+}
+
+</script>
 <?php
 }
 
@@ -60,12 +92,9 @@ function getTeachersList() {
 
 function generateClassesList() {
     $res = mysql_query("SELECT * FROM `classes` WHERE 1 ORDER BY `class_id`");
-    echo "<span class=\"s\">[<a href=\"./?addclass=1\">Add a new class to the list</a>]</span>";
-    echo "<div style=\"text-align:left; margin-left:50px; padding-left:50px; \">";
     while($row = mysql_fetch_assoc($res)) {
-        echo  "<div style=\"display:inline-block; padding:2px; width:80px; border:1px solid #964; background-color:#ecd\"><a href=\"./?class=" . $row['class_id']. "\">" . $row['class_name'] . "</a></div>";
+        echo  "\t<div><a href=\"./#!class:" . $row['class_id']. "\">" . $row['class_name'] . "</a></div>\n";
     }
-    echo "</div>";
 }
 
 function generateTeamsList() {
@@ -258,7 +287,7 @@ function editStudentMarks() {
 	}
 	foreach($_POST as $key=>$val)
 	if(is_int($key)) {
-	    if( $val > 100 ) $val = 0;
+	    if( $val > 200 ) $val = 0;
 	    if($val == "ab") $val = -1;
 	    if($str=="" || !strpos(".".$str,"{" . $key . "}")) {
 	        mysql_query("INSERT INTO `marks` (`student_id`, `exam_id`, `course_code`, `marks`) VALUES ('{$key}', '{$examId}', '{$subjectId}', '{$val}')");
@@ -419,12 +448,13 @@ function displayMarks($marksArr , $subjArr) {
 
 function getStudentsFromClass() {
     $classId = $_GET['class'];
+    $examId = "";
 
     echo "<div id=\"options\" class=\"np\">";
     echo "<div id=\"optionHead\">Options</div><br />";
     echo "<div style=\"display:none;\" id=\"optionBody\">";
 
-    echo "<a class=\"s\" href=\"./?addstudents=1&class=" . $_GET['class'] . "\">Add students to this class</a><hr />";
+    echo "<a class=\"s\" href=\"./?addstudents=1&class=" . $classId . "\">Add students to this class</a><hr />";
     $curriculum = getClassCurriculum($classId);
     $res = mysql_query("SELECT `course_code`,`course_name`,`avg_req` FROM `coursecode` WHERE `curriculum`='" . $curriculum . "'");
     echo "<form action=\"./?subject=add\" method=\"POST\"><span class=\"s\">Add new course for the class:</span> <select name=\"courseId\">";
@@ -442,30 +472,29 @@ function getStudentsFromClass() {
     echo "</div></div>\n\n";
 
 
-echo "<h3><a href=\"./?class=" . $classId . "\">Class " . getClassName($classId) . "</a><span id=\"examName\"></span></h3>\n<h4 class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "</span></h4>\n<h4 class=\"s np\">Class Teacher: " . getClassTeacherLink($classId) . "</h4><br />";
+echo "<h3><a href=\"./#!class:" . $classId . "\">Class " . getClassName($classId) . "</a><span id=\"examName\"></span></h3>\n<h4 class=\"s\"><span class=\"np\">Curriculum : " . getClassCurriculum($classId) . "</span></h4>\n<h4 class=\"s np\">Class Teacher: " . getClassTeacherLink($classId) . "</h4><br />";
 
 
 $str =<<<abc
     <table cellpadding="0" cellspacing="0" width="100%"><tr><td style="padding:0; vertical-align:bottom;">
     <div id="tabbed" class="np">
-        <div onclick="getStudentsFromClass();">Class List</div> <a><div onclick="sortByExamNo();">Marks</div> <div onclick="analyse();">Analysis</div>
+        <div onclick="window.location = '#!class:' + classId;">Class List</div> <div onclick="sortByExamNo();">Marks</div> <div onclick="analyse();">Analysis</div>
     </div></td>
     <td style="padding:0;"><div class="np" id="changer"><span id="listContainer"></span></div></td>
 abc;
-
 
     $examId = 0;
     /**
      *	The part where the list of exams is listed
     **/
     
-    $str .= "<td style=\"padding:0;\"><div style=\"float:right; margin:0; \" class=\"block np\"><span class=\"s\">View Exam Marks: </span>";
+    $str .= "<td style=\"padding:0;\"><div style=\"float:right; margin:0; \" class=\"block np\"><span class=\"s\">View Marks: </span>";
     $res2 = mysql_query("SELECT * FROM `exams` WHERE `class` = '" . getClass($classId) . "';");
     if(mysql_num_rows($res2) == 0) {
-        $str .= "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted for this class. Use the box below to add a new exam to the list.</div>";
+        $str .= "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted..</div>";
     }
     else {
-    $str .= "\n<select id=\"selectExam\" onchange=\"updateExamInfo(" . $_GET['class'] . ", this.value);\">";
+    $str .= "\n<select id=\"selectExam\" onchange=\"window.location = '#!class:' + classId + '|exam:' + this.value + '|list';\">";
     $str .= "\n<option value=\"0\" selected=\"selected\">--Select an Exam from below--</option>";
     while($row2 = mysql_fetch_assoc($res2)) {
     if($examId && $examId == $row2['exam_id'])
@@ -483,7 +512,7 @@ $str.=<<<abc
     <script>
         $(document).ready(function() {
 
-	    $.getJSON("./ajax.php?class={$_GET['class']}",function(data) {
+	    $.getJSON("./ajax.php?class={$classId}",function(data) {
 	        studentsList = data;
 		generateStudentMapping();
 

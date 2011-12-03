@@ -26,8 +26,14 @@ a:visited {color:#00E; }
 .closeButton:hover {color:#00e; background-color:#aab; text-decoration:none; }
 
 #menu {border-bottom:2px solid #77c; height:30px; position:fixed; top:0; width:100%; background-color:#fff; }
+#menu span {padding:0; margin:0; display:inline-block; }
 #menu a {padding:5px; padding-bottom:6px; margin:0; display:inline-block; }
 #menu a:hover {text-decoration:none; padding-bottom:6px; background-color:#eef; border-bottom:2px solid #ccd; }
+#menu .submenu {position:fixed; border:1px solid #77c; width:100px; font-size:small; text-align:center; cursor:pointer; margin-left:-5px; margin-top:0px; display:none; }
+#menu .submenu div {background-color:#fff; }
+#amenu .submenu div:hover {background-color:#e1e1f1; }
+#menu .submenu div a {display:block; }
+#menu .submenu div a:hover {border-bottom:0;; }
 #currentMenuItem {background-color:#e1e1f1; border-bottom:2px solid #ccd; }
 #menu a#currentMenuItem:hover {background-color:#e1e1f1; border-bottom:2px solid #eef; }
 
@@ -45,7 +51,7 @@ th {font-size:80%; }
 
 #options {cursor:default; float:right; display:inline; }
 #optionHead {cursor:pointer; margin:5px; float:right;  background-color:rgba(255,255,255,.8); border-radius:5px; border:2px solid #777; padding:3px; width:70px;}
-#optionBody {margin-top:5px; padding:5px; padding-top:15px; background-color:rgba(255,255,255,.7); border:2px solid #777; width:180px;  }
+#optionBody {margin-top:10px; padding:5px; padding-top:15px; background-color:rgba(255,255,255,.9); border:2px solid #777; width:180px; position:absolute; right:10px;  }
 
 
 #frameset {font-size:80%; margin-top:20px; margin-bottom:-20px; background-color:#fff; color:#111; border:2px solid #888; border-radius:8px; display:inline-block; background-color:rgba(153,102,68,.6); }
