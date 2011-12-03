@@ -297,8 +297,8 @@ function editStudentMarks() {
 	        mysql_query($query);
 	    }
 	}
-    
-	header("Location: ./?class=" . $classId . "&exam=" . $examId);
+    	echo "<script>window.location = './#!class:" . $classId . "|exam:" . $examId . "';</script>";
+	//header("Location: ./?class=" . $classId . "&exam=" . $examId);
         return;
     }
 
