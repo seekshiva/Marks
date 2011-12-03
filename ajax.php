@@ -17,7 +17,7 @@ $str .=<<<str
 
 str;
 
-$res = mysql_query("SELECT `student_id`, `exam_no`, `adm_no`, `student_name`, `team_id`, `house_id`, `mentor_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `exam_no` ASC");
+$res = mysql_query("SELECT `student_id`, `exam_no`, `adm_no`, `student_name`, `team_id`, `house_id`, `mentor_id` FROM `students` WHERE `class_id` = '" . $classId . "' ORDER BY `adm_no` ASC");
 $count = 1;
 while($row = mysql_fetch_assoc($res))
 {
