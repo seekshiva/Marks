@@ -1,4 +1,5 @@
 <?php
+if(count($_GET) == 0) header("Location: ./student.php");
 include("functions.lib.php");
 if(isset($_GET['class']) && !isset($_GET['editmarks']) && !isset($_GET['addstudents'])) {
 if(isset($_GET['exam'])) header("Location: ./#!class:" . $_GET['class'] . "|exam:" . $_GET['exam'] . "|list");
