@@ -69,7 +69,7 @@ function getStudentsFromClass() {
     t.setAttribute("cellpadding","0");
     t.setAttribute("cellspacing","0");
     for(var i=1; i < studentsList.length; ++i) {
-	str += "<tr><td onclick=\"this.childNodes[1].checked = !this.childNodes[1].checked; if($(this).parent().attr('class') == 'cb_selected') $(this).parent().attr('class',''); else $(this).parent().attr('class','cb_selected'); \" style=\"cursor:pointer; \"><span class=\"op\">" + i + "</span><input class=\"np\" type=\"checkbox\" onclick=\"\" name=\"uids[]\" value=\"" + studentsList[i].sid + "\"></td>";
+	str += "<tr><td onclick=\"this.childNodes[1].checked = !this.childNodes[1].checked; if($(this).parent().attr('class') == 'cb_selected') $(this).parent().attr('class',''); else $(this).parent().attr('class','cb_selected'); \" style=\"cursor:pointer; \"><span class=\"op\">" + i + "</span><input class=\"np\" type=\"checkbox\" name=\"uids[]\" value=\"" + studentsList[i].sid + "\"></td>";
 	str += "<td>" + studentsList[i].adm_no + "</td>";
 	str += "<td>" + studentsList[i].exam_no + "</td>";
 	str += "<td><a href=\"./student.php?sid=" + studentsList[i].sid + "\"><nobr>" + studentsList[i].name + "</nobr></td>";
@@ -79,6 +79,7 @@ function getStudentsFromClass() {
 	str += "<td><a" + link + ">" + houses[studentsList[i].house] + "</a></td>";
 	str += "<td>" + teachers[studentsList[i].mentor].name + "</td></tr>\n";
     }
+    str += "<script>$(\"input[type=checkbox] \").click(function(e) {e.stopPropagation(); $(this).parent().parent().attr('class',($(this).parent().parent().attr('class') == \"cb_selected\")?\"\":\"cb_selected\"); });</script>";
     t.innerHTML = str;
     $("#marks-div").html(t);
     $("#examName").html("");
