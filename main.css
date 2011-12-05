@@ -31,9 +31,8 @@ a:visited {color:#00E; }
 #menu a:hover {text-decoration:none; padding-bottom:6px; background-color:#eef; border-bottom:2px solid #ccd; }
 #menu .submenu {position:fixed; border:1px solid #77c; width:100px; font-size:small; text-align:center; cursor:pointer; margin-left:-5px; margin-top:0px; display:none; }
 #menu .submenu div {background-color:#fff; }
-#amenu .submenu div:hover {background-color:#e1e1f1; }
 #menu .submenu div a {display:block; }
-#menu .submenu div a:hover {border-bottom:0;; }
+#menu .submenu div a:hover {border-bottom:0; }
 #currentMenuItem {background-color:#e1e1f1; border-bottom:2px solid #ccd; }
 #menu a#currentMenuItem:hover {background-color:#e1e1f1; border-bottom:2px solid #eef; }
 
@@ -64,3 +63,6 @@ th {font-size:80%; }
 .blockli {display:inline-block; border:1px solid #000; margin:5px; margin-top:10px; margin-bottom:0; padding:20px; width:140px; height:100px; background-color:rgba(255,255,255,.4); }
 .blockli:hover {background-color:rgba(255,255,255,.5);}
 .blockli a {display:inline-block; padding-top:85px; color:#333; font-weight:bold; font-size:80%; }
+
+#menu .blockli {height:30px; width:100px; padding:0; margin:0; } !important
+#menu .blockli a {padding:0; margin:0; } !important

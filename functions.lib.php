@@ -19,9 +19,7 @@ function getMenu($num) {
     <span><a <?php if($num == 3) echo "id=\"currentMenuItem\" "; ?>href="./teachers.php">Teachers</a></span>
     <span><a <?php if($num == 1 && isset($_GET['house'])) echo "id=\"currentMenuItem\" "; ?>href="./?house=0">Houses</a>
     <div class="submenu">
-        <div>VIII-A</div>
-        <div>VIII-B</div>
-        <div>VIII-C</div>
+<?php generateNewHousesList(); ?>
     </div>
     </span>
     <span><a <?php if($num == 5) echo "id=\"currentMenuItem\" "; ?>href="#">Teams</a></span>
@@ -107,7 +105,14 @@ function generateTeamsList() {
 function generateHousesList() {
     $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
     while($row = mysql_fetch_assoc($res)) {
-        echo  "<div class=\"blockli\"><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></div>";
+        echo  "\t<div class=\"blockli\"><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></div>\n";
+    }
+}
+
+function generateNewHousesList() {
+    $res = mysql_query("SELECT * FROM `houses` WHERE 1 ORDER BY `house_id`");
+    while($row = mysql_fetch_assoc($res)) {
+        echo  "\t<div style=\"width:150px; \"><a href=\"./?house=" . $row['house_id']. "\">" . $row['house_name'] . "</a></div>\n";
     }
 }
 
