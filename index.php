@@ -1,4 +1,6 @@
 <?php
+session_start();
+if(!isset($_SESSION['user']) || $_SESSION['user'] == "0") header("Location: ./login.php");
 //if(count($_GET) == 0) header("Location: ./student.php");
 include("functions.lib.php");
 if(isset($_GET['class']) && !isset($_GET['editmarks']) && !isset($_GET['addstudents'])) {

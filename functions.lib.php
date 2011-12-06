@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("connect.php");
 
 /*
@@ -7,9 +8,13 @@ include("connect.php");
 function init() {}
 
 function getMenu($num) {
+$login = "<a href=\"./login.php\">Login</a>";
+if(isset($_SESSION['user'])) {
+$login = "<span style=\"color:#666; padding:3px;  \">" . $_SESSION['user'] . "@sjnschool.com</span> <a href=\"./logout.php\">Logout</a>";
+}
 ?>
 <div id="menu">
-    <div style="float:right; "><span style="color:#666; padding:3px;  ">youremail@sjnschool.com</span> <a href="#logout">Logout</a></div>
+    <div style="float:right; "><?php echo $login; ?></div>
     <span <?php if($num == 1 && count($_GET) == 0) echo "id=\"currentMenuItem\" ";  ?>><a href="#">Class</a>
     <div class="submenu">
 <?php generateClassesList(); ?>

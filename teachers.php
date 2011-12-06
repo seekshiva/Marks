@@ -1,5 +1,6 @@
 <?php
-include("connect.php");
+session_start();
+if(!isset($_SESSION['user']) || $_SESSION['user'] == "0") header("Location: ./login.php");
 include("functions.lib.php");
 
 if(isset($_GET['teacher'])) {
