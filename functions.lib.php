@@ -474,7 +474,7 @@ echo "<h3><a href=\"./#!class:" . $classId . "\">Class " . getClassName($classId
 $str =<<<abc
     <table cellpadding="0" cellspacing="0" width="100%"><tr><td style="padding:0; vertical-align:bottom;">
     <div id="tabbed" class="np">
-        <div onclick="window.location = '#!class:' + classId;">Class List</div> <div onclick="sortByExamNo();">Marks</div> <div onclick="analyse();">Analysis</div>
+        <div onclick="window.location = '#!class:' + classId;">Class List</div> <div onclick="sortByExamNo();">Marks</div> <div onclick="analyse();">Abstract</div>
     </div></td>
     <td style="padding:0;"><div class="np" id="changer"><span id="listContainer"></span></div></td>
 abc;
