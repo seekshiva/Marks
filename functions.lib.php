@@ -283,7 +283,7 @@ function getClassTeacherLink($classId) {
 }
 
 function getClassAvg($class,$examId,$courseId) {
-    $row = mysql_fetch_assoc(mysql_query("SELECT AVG(`marks`) AS `avg` FROM `marks` WHERE `student_id` IN (SELECT `student_id` FROM `students` WHERE `exam_id` = '{$examId}' AND `class_id` IN (SELECT `class_id` FROM `classes` WHERE `class` = '{$class}')) AND `course_code` = '{$courseId}' AND `marks` != '-1'"));
+    $row = mysql_fetch_assoc(mysql_query("SELECT AVG(`marks`) AS `avg` FROM `marks` WHERE `student_id` IN (SELECT `student_id` FROM `students` WHERE `exam_id` = '{$examId}' AND `class_id` IN (SELECT `class_id` FROM `classes` WHERE `class` = '{$class}')) AND `course_code` = '{$courseId}' AND `marks` != '-1' AND `marks` != '0'"));
     $avg = $row['avg'];
     $avg = (strpos($avg,"."))?substr($avg,0,strpos($avg,".") + 3):$avg;
     return $avg;

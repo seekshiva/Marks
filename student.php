@@ -4,8 +4,9 @@ include("functions.lib.php");
 <!doctype html>
 <html>
 <head>
-<title>Student Information</title>
-<link rel="stylesheet" href="main.css">
+<title>Student Information - Marks App by V. Shiva Nandan</title>
+<link rel="stylesheet" media="screen" href="main.css">
+<link rel="stylesheet" media="print" href="print.css">
 <script src="jquery.js"></script>
 </head>
 <body>
@@ -20,16 +21,16 @@ if(isset($_GET['sid'])) {
    if(mysql_num_rows($res) == 0) die("Not a valid student id or the house and team info about the student has not been listed yet!");
    $row = mysql_fetch_assoc($res);
    
-   if($row['house_id'] == 0)
+   //if($row['house_id'] == 0)
        $genderPrefix = "Their";
-   else if($row['house_id'] <= 12)
+   /*else if($row['house_id'] <= 12)
        $genderPrefix = "His";
    else
-       $genderPrefix = "Her";
+       $genderPrefix = "Her";*/
    $classId = $row['class_id'];
    echo "<table cellpadding='10'><tr><td><img src=\"default.jpg\" height=\"70px\"></td><td>";
-   echo "<h3 style=\"margin:0;\">" . $row['student_name'] . "</h3>";
-   echo "<div style=\"font-size:70%; \">";
+   echo "<h2 class=\"snp\" style=\"margin:0;\">" . $row['student_name'] . "</h2>";
+   echo "<div class=\"snp\">";
    echo "is from class <b><a href=\"./?class=" . $row['class_id'] . "\">" . getClassName($row['class_id']) . "</a></b>.<br />";
    echo $genderPrefix . " Class Teacher is <b>" . getClassTeacherLink($row['class_id']) . "</b> and " . $genderPrefix . " personal mentor is <b>" . getMentorName($row['student_id']) . "</b>.<br />";
    echo "Admission Number: <b>" . $row['adm_no'] . "</b><br />";
@@ -60,10 +61,10 @@ if(isset($_GET['sid'])) {
 	      $sum   = 0;
 	      echo "<tr><td rowspan=\"2\">" . $marksArr['exam_name'] . "</td>";
 	      echo "<td>Student</td>";
-    	      foreach($subjArr as $key=>$val) {error_log("fndabjb");
+    	      foreach($subjArr as $key=>$val) {
                   if(!isset($marksArr[$key])) {
 	    	      $mark = "-";
-	    	      continue;
+	    	      //continue;
 		  }
 	    	  else {
 	              $mark = $marksArr[$key];
@@ -85,7 +86,7 @@ if(isset($_GET['sid'])) {
     	      foreach($subjArr as $key=>$val) {
                   if(!isset($marksArr[$key])) {
 	              $mark = "-";
-	      	      continue;
+	      	      //continue;
 	      	  }
 	       	  else {
 	      	      $mark = $marksArr[$key];
@@ -95,7 +96,7 @@ if(isset($_GET['sid'])) {
 	      	  }
 	      	  //$row = mysql_fetch_assoc(mysql_query("SELECT `class_id` FROM `students` WHERE `student_id` = '" . $_GET['sid'] . "'"));
 	      	  //$classId = $row['class_id'];
-	      	  echo "<td>" . $classId . getClassAvg(getClass($classId),1,$key) . "</td>";
+	      	  echo "<td>" . getClassAvg(getClass($classId),$marksArr['exam_id'],$key) . "</td>";
     	      }
     	      echo "</tr>";
 	   }
@@ -115,7 +116,7 @@ if(isset($_GET['sid'])) {
     foreach($subjArr as $key=>$val) {
         if(!isset($marksArr[$key])) {
 	    $mark = "-";
-	    continue;
+	    //continue;
 	}
 	else {
 	    $mark = $marksArr[$key];
@@ -131,13 +132,36 @@ if(isset($_GET['sid'])) {
     }
     $avg = $count ? $sum/$count : 0;
     $avg = substr($avg,0,strpos($avg,".") + 3);
-    echo "<td rowspan=\"2\">{$sum}</td><td rowspan=\"2\">{$avg}</td><td rowspan=\"2\">ranks #1</td></tr>";
+    echo "<td rowspan=\"2\">{$sum}</td><td rowspan=\"2\">{$avg}</td>";
 
+$str =<<<str
+SELECT `students`.`student_id`,SUM(`marks`.`marks`)/COUNT(`marks`.`marks`) AS `avg`
+FROM `students`,`marks`
+WHERE `marks`.`marks` != -1
+AND `students`.`student_id` = `marks`.`student_id`
+AND `marks`.`exam_id` = '{$marksArr['exam_id']}'
+AND `students`.`student_id` IN (
+   SELECT `student_id` FROM `students` WHERE `class_id` IN (
+      SELECT `class_id` FROM `classes` WHERE `class`  = (
+         SELECT `class` FROM `classes` WHERE `classes`.`class_id` = '{$classId}'
+      )
+   )
+)
+GROUP BY `students`.`student_id` ORDER BY `avg` DESC;
+str;
+    $res = mysql_query($str);
+    $tempcounter = 1;$rank = 0;
+    while($row = mysql_fetch_assoc($res)) {
+        if($row['student_id'] != $_GET['sid']) $tempcounter = $tempcounter +1;
+	else {$rank = $tempcounter; break;}
+    }
+
+    echo "<td rowspan=\"2\">{$rank}</td></tr>";
     echo "<tr><td>Class Avg</td>";
     foreach($subjArr as $key=>$val) {
         if(!isset($marksArr[$key])) {
 	    $mark = "-";
-	    continue;
+	    //continue;
 	}
 	else {
 	    $mark = $marksArr[$key];
@@ -145,7 +169,7 @@ if(isset($_GET['sid'])) {
 	        $mark = "ab";
 	    }
 	}
-	echo "<td>" . getClassAvg(getClass($classId),1,$key) . "</td>";
+	echo "<td>" . getClassAvg(getClass($classId),$marksArr['exam_id'],$key) . "</td>";
     }
     echo "</tr>";
    
