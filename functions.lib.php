@@ -282,6 +282,11 @@ function getClassTeacherLink($classId) {
     return ($row["teacher_name"])? "<a href=\"./teachers.php?teacherid=" . $row['teacher_id'] . "\">" . $row["teacher_name"] . "</a>":"not set";
 }
 
+function getClassAvg($class,$examId,$courseId) {
+    $row = mysql_fetch_assoc(mysql_query("SELECT AVG(`marks`) AS `avg` FROM `marks` WHERE `student_id` IN (SELECT `student_id` FROM `students` WHERE `exam_id` = '{$examId}' AND `class_id` IN (SELECT `class_id` FROM `classes` WHERE `class` = '{$class}')) AND `course_code` = '{$courseId}' AND `marks` != '-1'"));
+    return $row['avg'];
+}
+
 function editStudentMarks() {
     $classId   = $_GET['class'];
     $examId    = $_GET['exam'];
@@ -437,25 +442,6 @@ function getStudentsFromHouse($houseId) {
     }
 }
 
-function displayMarks($marksArr , $subjArr) {
-    if($marksArr["exam_id"] == -1) return;
-    $count = 0;
-    $sum   = 0;
-    echo "<tr><td>" . $marksArr['exam_name'] . "</td>";
-    foreach($subjArr as $key=>$val) {
-        if(!isset($marksArr[$key])) {
-	    echo "<td>-</td>";
-	    continue;
-	}
-	else echo "<td>" . $marksArr[$key] . "</td>";
-        $count = $count + 1;
-        $sum = $sum + $marksArr[$key];
-    }
-    $avg = $count ? $sum/$count : 0;
-    $avg = substr($avg,0,strpos($avg,".") + 3);
-    echo "<td>{$sum}</td><td>{$avg}</td></tr>";
-}
-
 function getStudentsFromClass() {
     $classId = $_GET['class'];
     $examId = "";
@@ -545,5 +531,32 @@ $str .=<<<abc
 abc;
     echo $str;
 include("signatures.php");
+}
+
+function displayMarks($marksArr , $subjArr) {
+    if($marksArr["exam_id"] == -1) return;
+    $count = 0;
+    $sum   = 0;
+    echo "<tr><td>" . $marksArr['exam_name'] . "</td>";
+    foreach($subjArr as $key=>$val) {
+        if(!isset($marksArr[$key])) {
+	    $mark = "-";
+	    continue;
+	}
+	else {
+	    $mark = $marksArr[$key];
+	    if($mark == -1) {
+	        $mark = "ab";
+	    }
+	    else {
+                $count = $count + 1;
+        	$sum = $sum + $marksArr[$key];
+	    }
+	}
+	echo "<td>" . $mark . "</td>";
+    }
+    $avg = $count ? $sum/$count : 0;
+    $avg = substr($avg,0,strpos($avg,".") + 3);
+    echo "<td>{$sum}</td><td>{$avg}</td></tr>";
 }
 ?>

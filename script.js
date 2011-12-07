@@ -403,10 +403,10 @@ function analyse() {
 	}
     }
     var temp = ["90","80","70","60","50","f","ab"],
-    temp2 = {"90":"90-100","80":"80-90","70":"70-80","60":"60-70","50":"50-60","f":"< 50","ab":"ab"};
+    temp2 = {"90":"90-100","80":"80-89","70":"70-79","60":"60-69","50":"50-59","f":"< 50","ab":"ab"};
 
     
-    for(var i = 1; i < temp.length; ++i) {
+    for(var i = 0; i < temp.length; ++i) {
 	str += "<tr><th>"+ temp2[temp[i]] + "</th>";
 	for(var j = 0; j < subjects.length; ++j) {
 	    str += "<td style=\"text-align:center; \">" + range[subjects[j]["code"]][temp[i]] + "</td>";
@@ -416,7 +416,14 @@ function analyse() {
 	}
 	str += "</tr>\n";
     }
-    str += "</table>";
+    str += "<tr><th>Class Avg</th>";
+    for(var j = 0; j < subjects.length; ++j) {
+	str += "<td style=\"text-align:center; \">" + marks.class_avg[subjects[j]["code"]] + "</td>";
+    }
+    for(var j = 0; j < no_avg_subjects.length; ++j) {
+	str += "<td style=\"text-align:center; \">" + marks.class_avg[no_avg_subjects[j]["code"]] + "</td>";
+    }
+    str += "</tr></table>";
     $("#marks-div").html(str);
 }
 

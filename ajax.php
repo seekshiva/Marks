@@ -152,6 +152,23 @@ $str .=<<<str
 str;
 }
 
+
+$str .=<<<str
+    ],
+    "class_avg" : {
+str;
+
+for($i = 0; $i < count($subjectArr["code"]); $i = $i + 1) {
+   $comma = ($i == "0")?"":",";
+$avg = getClassAvg(getClass($classId),$examId,$subjectArr["code"][$i]);
+$str .=<<<str
+{$comma}
+	"{$subjectArr["code"][$i]}": "{$avg}"
+str;
+}
+
+
+
 $c = count($rank);
 $rl ="";
 for($i = 0; $i <= $c; $i = $i + 1)
@@ -160,7 +177,8 @@ if(isset($thisrank[$i])) {
 }
 $rl = substr($rl,0,strlen($rl) - 1);
 $str .=<<<str
-    ],
+
+    },
     "class_total_strength":"$c",
     "ranklist": [$rl]
 }
