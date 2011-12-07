@@ -6,6 +6,7 @@ if($q == "") {
 echo "[]";
 die;
 }
+$q = str_replace(" ","% ",$q);
 $query = "SELECT * FROM `students` WHERE `student_name` LIKE '{$q}%' OR `student_name` LIKE '% {$q}%'";
 $res = mysql_query($query);
 $str = "[\n";
