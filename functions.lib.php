@@ -284,7 +284,9 @@ function getClassTeacherLink($classId) {
 
 function getClassAvg($class,$examId,$courseId) {
     $row = mysql_fetch_assoc(mysql_query("SELECT AVG(`marks`) AS `avg` FROM `marks` WHERE `student_id` IN (SELECT `student_id` FROM `students` WHERE `exam_id` = '{$examId}' AND `class_id` IN (SELECT `class_id` FROM `classes` WHERE `class` = '{$class}')) AND `course_code` = '{$courseId}' AND `marks` != '-1'"));
-    return $row['avg'];
+    $avg = $row['avg'];
+    $avg = (strpos($avg,"."))?substr($avg,0,strpos($avg,".") + 3):$avg;
+    return $avg;
 }
 
 function editStudentMarks() {
@@ -484,13 +486,13 @@ abc;
      *	The part where the list of exams is listed
     **/
     
-    $str .= "<td style=\"padding:0;\"><div style=\"float:right; margin:0; \" class=\"block np\"><span class=\"s\">View Marks: </span>";
+    $str .= "<td style=\"padding:0;\"><div style=\"float:right; margin:0; \" class=\"block np\">";
     $res2 = mysql_query("SELECT * FROM `exams` WHERE `class` = '" . getClass($classId) . "';");
     if(mysql_num_rows($res2) == 0) {
         $str .= "<div style=\"margin:5px; \" class=\"s\">No exams has been conducted..</div>";
     }
     else {
-    $str .= "\n<select id=\"selectExam\" onchange=\"window.location = '#!class:' + classId + '|exam:' + this.value + '|list';\">";
+    $str .= "\n<span class=\"s\">View Marks: </span>\n<select id=\"selectExam\" onchange=\"window.location = '#!class:' + classId + '|exam:' + this.value + '|list';\">";
     $str .= "\n<option value=\"0\" selected=\"selected\">--Select an Exam from below--</option>";
     while($row2 = mysql_fetch_assoc($res2)) {
     if($examId && $examId == $row2['exam_id'])
@@ -537,7 +539,8 @@ function displayMarks($marksArr , $subjArr) {
     if($marksArr["exam_id"] == -1) return;
     $count = 0;
     $sum   = 0;
-    echo "<tr><td>" . $marksArr['exam_name'] . "</td>";
+    echo "<tr><td rowspan=\"2\">" . $marksArr['exam_name'] . "</td>";
+    echo "<td>Student</td>";
     foreach($subjArr as $key=>$val) {
         if(!isset($marksArr[$key])) {
 	    $mark = "-";
@@ -557,6 +560,24 @@ function displayMarks($marksArr , $subjArr) {
     }
     $avg = $count ? $sum/$count : 0;
     $avg = substr($avg,0,strpos($avg,".") + 3);
-    echo "<td>{$sum}</td><td>{$avg}</td></tr>";
+    echo "<td rowspan=\"2\">{$sum}</td><td rowspan=\"2\">{$avg}</td><td rowspan=\"2\">ranks #1</td></tr>";
+
+    echo "<tr><td>Class Avg</td>";
+    foreach($subjArr as $key=>$val) {
+        if(!isset($marksArr[$key])) {
+	    $mark = "-";
+	    continue;
+	}
+	else {
+	    $mark = $marksArr[$key];
+	    if($mark == -1) {
+	        $mark = "ab";
+	    }
+	}
+	$row = mysql_fetch_assoc(mysql_query("SELECT `class_id` FROM `students` WHERE `student_id` = '" . $_GET['sid'] . "'"));
+	$classId = $row['class_id'];
+	echo "<td>" . getClassAvg(getClass(getClass),1,$key) . "</td>";
+    }
+    echo "</tr>";
 }
 ?>

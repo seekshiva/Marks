@@ -1,5 +1,4 @@
 <?php
-include("connect.php");
 include("functions.lib.php");
 ?>
 <!doctype html>
@@ -48,15 +47,58 @@ if(isset($_GET['sid'])) {
    $res = mysql_query($query);
    if(mysql_num_rows($res) == 0) die("The student has not written any exam yet!");
 
-   echo "<br /><table style='text-align:center' border='1' cellpadding='3' cellspacing='0'>\n<tr><th>Examination</th>";
+   echo "<br /><table style='text-align:center' border='1' cellpadding='3' cellspacing='0'>\n<tr><th>Examination</th><th>Marks</th>";
    foreach($subjArr as $key=>$val) echo "<th>" . $val . "</th>";
-   echo "<th>Total</th><th>Percentage</th></tr>\n";
+   echo "<th>Total</th><th>Percentage</th><th>Rank</th></tr>\n";
 
    $marksArr = Array();
    $marksArr["exam_id"] = -1;
    while($row = mysql_fetch_assoc($res)) {
        if($marksArr["exam_id"] != $row['exam_id']) { //new row
-           displayMarks($marksArr , $subjArr);
+           if($marksArr["exam_id"] != -1) {
+	      $count = 0;
+	      $sum   = 0;
+	      echo "<tr><td rowspan=\"2\">" . $marksArr['exam_name'] . "</td>";
+	      echo "<td>Student</td>";
+    	      foreach($subjArr as $key=>$val) {error_log("fndabjb");
+                  if(!isset($marksArr[$key])) {
+	    	      $mark = "-";
+	    	      continue;
+		  }
+	    	  else {
+	              $mark = $marksArr[$key];
+	    	      if($mark == -1) {
+	                  $mark = "ab";
+	    	      }
+	    	      else {
+                      	  $count = $count + 1;
+        	      	  $sum = $sum + $marksArr[$key];
+	    	      }
+	      	  }
+	      	  echo "<td>" . $mark . "</td>";
+              }
+    	      $avg = $count ? $sum/$count : 0;
+    	      $avg = substr($avg,0,strpos($avg,".") + 3);
+    	      echo "<td rowspan=\"2\">{$sum}</td><td rowspan=\"2\">{$avg}</td><td rowspan=\"2\">ranks #1</td></tr>";
+
+    	      echo "<tr><td>Class Avg</td>";
+    	      foreach($subjArr as $key=>$val) {
+                  if(!isset($marksArr[$key])) {
+	              $mark = "-";
+	      	      continue;
+	      	  }
+	       	  else {
+	      	      $mark = $marksArr[$key];
+	      	      if($mark == -1) {
+	                  $mark = "ab";
+	    	      }
+	      	  }
+	      	  //$row = mysql_fetch_assoc(mysql_query("SELECT `class_id` FROM `students` WHERE `student_id` = '" . $_GET['sid'] . "'"));
+	      	  //$classId = $row['class_id'];
+	      	  echo "<td>" . $classId . getClassAvg(getClass($classId),1,$key) . "</td>";
+    	      }
+    	      echo "</tr>";
+	   }
 	   $marksArr = Array();
 	   $marksArr["exam_id"]   = $row['exam_id'];
 	   $marksArr["exam_name"] = $row['exam_name'];
@@ -66,7 +108,46 @@ if(isset($_GET['sid'])) {
 	   $marksArr[$row['course_code']] = $row['marks'];
        }
    }
-   displayMarks($marksArr , $subjArr);
+    $count = 0;
+    $sum   = 0;
+    echo "<tr><td rowspan=\"2\">" . $marksArr['exam_name'] . "</td>";
+    echo "<td>Student</td>";
+    foreach($subjArr as $key=>$val) {
+        if(!isset($marksArr[$key])) {
+	    $mark = "-";
+	    continue;
+	}
+	else {
+	    $mark = $marksArr[$key];
+	    if($mark == -1) {
+	        $mark = "ab";
+	    }
+	    else {
+                $count = $count + 1;
+        	$sum = $sum + $marksArr[$key];
+	    }
+	}
+	echo "<td>" . $mark . "</td>";
+    }
+    $avg = $count ? $sum/$count : 0;
+    $avg = substr($avg,0,strpos($avg,".") + 3);
+    echo "<td rowspan=\"2\">{$sum}</td><td rowspan=\"2\">{$avg}</td><td rowspan=\"2\">ranks #1</td></tr>";
+
+    echo "<tr><td>Class Avg</td>";
+    foreach($subjArr as $key=>$val) {
+        if(!isset($marksArr[$key])) {
+	    $mark = "-";
+	    continue;
+	}
+	else {
+	    $mark = $marksArr[$key];
+	    if($mark == -1) {
+	        $mark = "ab";
+	    }
+	}
+	echo "<td>" . getClassAvg(getClass($classId),1,$key) . "</td>";
+    }
+    echo "</tr>";
    
    echo "</table>";
 }

@@ -90,10 +90,17 @@ $stuArr[$row['student_id']][$row['course_code']] = $row['marks'];
 
 $ename = getExamName($examId);
 $emaxmarks = getExamMaxMarks($examId);
+
+$res = mysql_query("SELECT `class_id` FROM `classes` WHERE `class` = '" . getClass($_GET['class']) . "'");
+$temp = "";
+while($row = mysql_fetch_assoc($res)) $temp .= ", \"" . $row['class_id'] . "\":\"1\"";
+$temp = substr($temp,2);
+
 $str =<<<str
 {
     "exam_name":"$ename",
     "exam_max_marks":"$emaxmarks",
+    "classes":{{$temp}},
 
 str;
 

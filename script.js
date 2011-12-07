@@ -375,7 +375,7 @@ function analyse() {
 		range[no_avg_subjects[j]["code"]]["ab"]++;
 		continue;
 	    }
-	    mark = mark * 100 / marks.exam_max_marks;
+	    mark = mark * 100 / marks.exam_max_marks;console.log();
 	    if(mark >= 90) {
 		range[no_avg_subjects[j]["code"]]["90"]++;
 		continue;		
@@ -416,14 +416,14 @@ function analyse() {
 	}
 	str += "</tr>\n";
     }
-    str += "<tr><th>Class Avg</th>";
+    str += "<tr><th>Class Avg %</th>";
     for(var j = 0; j < subjects.length; ++j) {
-	str += "<td style=\"text-align:center; \">" + marks.class_avg[subjects[j]["code"]] + "</td>";
+	str += "<td style=\"text-align:center; \">" + marks.class_avg[subjects[j]["code"]] * 100 / marks.exam_max_marks + "</td>";
     }
     for(var j = 0; j < no_avg_subjects.length; ++j) {
-	str += "<td style=\"text-align:center; \">" + marks.class_avg[no_avg_subjects[j]["code"]] + "</td>";
+	str += "<td style=\"text-align:center; \">" + marks.class_avg[no_avg_subjects[j]["code"]] * 100 / marks.exam_max_marks + "</td>";
     }
-    str += "</tr></table>";
+    str += "</table>";
     $("#marks-div").html(str);
 }
 
@@ -443,8 +443,14 @@ function urlParse() {
 	harr[i] = harr[i].split(":");
     }
     if(harr[0][0] == "class") {
-	if(classId != harr[0][1]) {
+	if(classId != harr[0][1]) {console.log("new class");
 	    classId = harr[0][1];
+	    if(marks) {
+		if(marks.classes[classId] == undefined) {
+		    marks = undefined;
+		    examId = 0;
+		}
+	    }
 	    $("#wrapper").load("./template.php?class=" + classId,function() {
 		$("#optionHead").click(function(e) {
 		    $("#optionBody").slideToggle();
